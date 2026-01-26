@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Message } from "@/types";
 import {
@@ -8,7 +7,7 @@ import {
   sendMessageToConversation,
   createMessagesChannel,
   removeChannel,
-} from "@/services/supabaseService";
+} from "@/services/appwriteService";
 
 export function useMessages(conversationId: string | null) {
   const { user } = useAuth();
@@ -52,21 +51,21 @@ export function useMessages(conversationId: string | null) {
 
     fetchMessages();
 
-    const channel = createMessagesChannel(conversationId, (payload) => {
+    const subscription = createMessagesChannel(conversationId, (payload) => {
       console.log("New message received:", payload);
-      const newMessage = payload.new as Message;
+      const newMessage = payload as Message;
       setMessages((prev) => {
         if (prev.some((m) => m.id === newMessage.id)) return prev;
         return [...prev, newMessage];
       });
 
       if (user && newMessage.sender_id !== user.id) {
-        supabase.from("messages").update({ is_read: true }).eq("id", newMessage.id);
+        markMessagesRead(conversationId, user.id);
       }
     });
 
     return () => {
-      removeChannel(channel);
+      removeChannel(subscription);
     };
   }, [conversationId, user, fetchMessages]);
 

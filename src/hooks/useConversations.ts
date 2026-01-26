@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { fetchConversationsForUser } from "@/services/supabaseService";
+import { fetchConversationsForUser } from "@/services/appwriteService";
 
 export interface ConversationWithDetails {
   id: string;

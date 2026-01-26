@@ -1,6 +1,15 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { User, Session } from "@supabase/supabase-js";
-import { supabase } from "@/integrations/supabase/client";
+import { account } from "@/integrations/appwrite/client";
+
+interface User {
+  $id: string;
+  email: string;
+  name?: string;
+}
+
+interface Session {
+  user: User;
+}
 
 interface AuthContextType {
   user: User | null;
@@ -19,51 +28,63 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Set up auth state listener FIRST
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
+    // Check for existing session
+    const checkSession = async () => {
+      try {
+        const currentUser = await account.get();
+        setUser(currentUser as User);
+        setSession({ user: currentUser as User });
+      } catch (error) {
+        // No active session
+        setUser(null);
+        setSession(null);
+      } finally {
         setLoading(false);
       }
-    );
+    };
 
-    // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
-
-    return () => subscription.unsubscribe();
+    checkSession();
   }, []);
 
   const signUp = async (email: string, password: string, name: string) => {
-    const redirectUrl = `${window.location.origin}/`;
-    
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: redirectUrl,
-        data: { name }
-      }
-    });
-    
-    return { error: error as Error | null };
+    try {
+      // Create user account
+      const newUser = await account.create("unique()", email, password, name);
+      
+      // Auto sign in after signup
+      await account.createEmailPasswordSession(email, password);
+      
+      setUser(newUser as User);
+      setSession({ user: newUser as User });
+      
+      return { error: null };
+    } catch (error) {
+      return { error: error as Error };
+    }
   };
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    
-    return { error: error as Error | null };
+    try {
+      await account.createEmailPasswordSession(email, password);
+      const currentUser = await account.get();
+      
+      setUser(currentUser as User);
+      setSession({ user: currentUser as User });
+      
+      return { error: null };
+    } catch (error) {
+      return { error: error as Error };
+    }
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    try {
+      await account.deleteSession("current");
+      setUser(null);
+      setSession(null);
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
   };
 
   return (

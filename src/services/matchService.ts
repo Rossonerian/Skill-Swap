@@ -1,5 +1,7 @@
-import { supabase } from "@/integrations/supabase/client";
+import { databases } from "@/integrations/appwrite/client";
+import { Query } from "appwrite";
 import { Skill, Profile } from "@/types";
+import { DB_ID, PROFILES_COLLECTION, MATCHES_COLLECTION } from "@/services/appwriteService";
 
 /**
  * Normalize skill names for comparison
@@ -241,16 +243,13 @@ export async function generateMatchesForUser(userId: string): Promise<number> {
 
   try {
     // Get current user's profile and skills
-    const { data: currentProfile, error: profileError } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("user_id", userId)
-      .single();
+    const profilesResponse = await databases.listDocuments(
+      DB_ID,
+      PROFILES_COLLECTION,
+      [Query.equal("user_id", userId)]
+    );
 
-    if (profileError) {
-      console.error("matchService.generateMatchesForUser: fetch profile error:", profileError);
-      return 0;
-    }
+    const currentProfile = profilesResponse.documents[0];
 
     if (!currentProfile) {
       console.warn("matchService.generateMatchesForUser: no profile found");
@@ -258,34 +257,26 @@ export async function generateMatchesForUser(userId: string): Promise<number> {
     }
 
     // Get user's offered skills
-    const { data: offeredData, error: offeredError } = await supabase
-      .from("user_skills_offered")
-      .select("skill:skills(*)")
-      .eq("user_id", userId);
-
-    if (offeredError) {
-      console.error("matchService.generateMatchesForUser: fetch offered skills error:", offeredError);
-      return 0;
-    }
+    const offeredResponse = await databases.listDocuments(
+      "USER_SKILLS_OFFERED_COLLECTION", // Replace with actual collection ID
+      "user_id",
+      [Query.equal("user_id", userId)]
+    );
 
     // Get user's wanted skills
-    const { data: wantedData, error: wantedError } = await supabase
-      .from("user_skills_wanted")
-      .select("skill:skills(*)")
-      .eq("user_id", userId);
+    const wantedResponse = await databases.listDocuments(
+      "USER_SKILLS_WANTED_COLLECTION", // Replace with actual collection ID
+      "user_id",
+      [Query.equal("user_id", userId)]
+    );
 
-    if (wantedError) {
-      console.error("matchService.generateMatchesForUser: fetch wanted skills error:", wantedError);
-      return 0;
-    }
-
-    const currentUserTeaches: MatchDetail[] = (offeredData || []).map((item: any) => ({
+    const currentUserTeaches: MatchDetail[] = (offeredResponse.documents || []).map((item: any) => ({
       skill: item.skill,
       normalizedName: normalizeSkillName(item.skill.name),
       direction: "teaches" as const,
     }));
 
-    const currentUserWants: MatchDetail[] = (wantedData || []).map((item: any) => ({
+    const currentUserWants: MatchDetail[] = (wantedResponse.documents || []).map((item: any) => ({
       skill: item.skill,
       normalizedName: normalizeSkillName(item.skill.name),
       direction: "wants" as const,
@@ -297,17 +288,13 @@ export async function generateMatchesForUser(userId: string): Promise<number> {
     }
 
     // Get all other users
-    const { data: allProfiles, error: allProfilesError } = await supabase
-      .from("profiles")
-      .select("*")
-      .neq("user_id", userId);
+    const allProfilesResponse = await databases.listDocuments(
+      DB_ID,
+      PROFILES_COLLECTION,
+      [Query.notEqual("user_id", userId)]
+    );
 
-    if (allProfilesError) {
-      console.error("matchService.generateMatchesForUser: fetch all profiles error:", allProfilesError);
-      return 0;
-    }
-
-    if (!allProfiles || allProfiles.length === 0) {
+    if (!allProfilesResponse.documents || allProfilesResponse.documents.length === 0) {
       return 0;
     }
 
@@ -315,30 +302,28 @@ export async function generateMatchesForUser(userId: string): Promise<number> {
     let matchCount = 0;
     const matchesToInsert = [];
 
-    for (const otherProfile of allProfiles) {
+    for (const otherProfile of allProfilesResponse.documents) {
       try {
         // Get other user's skills
-        const { data: otherOfferedData, error: otherOfferedError } = await supabase
-          .from("user_skills_offered")
-          .select("skill:skills(*)")
-          .eq("user_id", otherProfile.user_id);
+        const otherOfferedResponse = await databases.listDocuments(
+          "USER_SKILLS_OFFERED_COLLECTION",
+          "user_id",
+          [Query.equal("user_id", otherProfile.user_id)]
+        );
 
-        if (otherOfferedError) throw otherOfferedError;
+        const otherWantedResponse = await databases.listDocuments(
+          "USER_SKILLS_WANTED_COLLECTION",
+          "user_id",
+          [Query.equal("user_id", otherProfile.user_id)]
+        );
 
-        const { data: otherWantedData, error: otherWantedError } = await supabase
-          .from("user_skills_wanted")
-          .select("skill:skills(*)")
-          .eq("user_id", otherProfile.user_id);
-
-        if (otherWantedError) throw otherWantedError;
-
-        const otherUserTeaches: MatchDetail[] = (otherOfferedData || []).map((item: any) => ({
+        const otherUserTeaches: MatchDetail[] = (otherOfferedResponse.documents || []).map((item: any) => ({
           skill: item.skill,
           normalizedName: normalizeSkillName(item.skill.name),
           direction: "teaches" as const,
         }));
 
-        const otherUserWants: MatchDetail[] = (otherWantedData || []).map((item: any) => ({
+        const otherUserWants: MatchDetail[] = (otherWantedResponse.documents || []).map((item: any) => ({
           skill: item.skill,
           normalizedName: normalizeSkillName(item.skill.name),
           direction: "wants" as const,
@@ -384,19 +369,43 @@ export async function generateMatchesForUser(userId: string): Promise<number> {
       return 0;
     }
 
-    // Upsert matches (prevents duplicates)
-    const { data: inserted, error: insertError } = await supabase
-      .from("matches")
-      .upsert(matchesToInsert, {
-        onConflict: "user1_id,user2_id",
-      });
+    // Upsert matches
+    for (const match of matchesToInsert) {
+      try {
+        // Check if match already exists
+        const existingMatches = await databases.listDocuments(
+          DB_ID,
+          MATCHES_COLLECTION,
+          [
+            Query.equal("user1_id", match.user1_id),
+            Query.equal("user2_id", match.user2_id),
+          ]
+        );
 
-    if (insertError) {
-      console.error("matchService.generateMatchesForUser: upsert error:", insertError);
-      return 0;
+        if (existingMatches.documents.length > 0) {
+          // Update existing match
+          await databases.updateDocument(
+            DB_ID,
+            MATCHES_COLLECTION,
+            existingMatches.documents[0].$id,
+            match
+          );
+        } else {
+          // Create new match
+          await databases.createDocument(
+            DB_ID,
+            MATCHES_COLLECTION,
+            "unique()",
+            match
+          );
+        }
+        matchCount++;
+      } catch (error) {
+        console.error("matchService.generateMatchesForUser: error upserting match:", error);
+        continue;
+      }
     }
 
-    matchCount = matchesToInsert.length;
     return matchCount;
   } catch (error) {
     console.error("matchService.generateMatchesForUser: unexpected error:", error);
@@ -418,36 +427,38 @@ export async function getUserMatches(userId: string) {
   if (!userId) return [];
 
   try {
-    const { data: matches, error } = await supabase
-      .from("matches")
-      .select("*")
-      .or(`user1_id.eq.${userId},user2_id.eq.${userId}`)
-      .gte("match_score", 0)
-      .order("match_score", { ascending: false });
+    const matchesResponse = await databases.listDocuments(
+      DB_ID,
+      MATCHES_COLLECTION,
+      [
+        Query.or([
+          Query.equal("user1_id", userId),
+          Query.equal("user2_id", userId),
+        ]),
+        Query.greaterThanEqual("match_score", 0),
+        Query.orderDesc("match_score"),
+      ]
+    );
 
-    if (error) throw error;
+    if (!matchesResponse.documents || matchesResponse.documents.length === 0) return [];
 
-    if (!matches || matches.length === 0) return [];
-
-    // Get profile details for matched users
-    const matchedUserIds = matches.map((m: any) =>
+    const matchedUserIds = matchesResponse.documents.map((m: any) =>
       m.user1_id === userId ? m.user2_id : m.user1_id
     );
 
-    const { data: profiles, error: profileError } = await supabase
-      .from("profiles")
-      .select("*")
-      .in("user_id", matchedUserIds);
+    const profilesResponse = await databases.listDocuments(
+      DB_ID,
+      PROFILES_COLLECTION,
+      [Query.equal("user_id", matchedUserIds)]
+    );
 
-    if (profileError) throw profileError;
-
-    const profileMap = (profiles || []).reduce((acc: any, p: any) => {
+    const profileMap = (profilesResponse.documents || []).reduce((acc: any, p: any) => {
       acc[p.user_id] = p;
       return acc;
     }, {});
 
     // Enrich matches with profile data
-    return matches.map((match: any) => {
+    return matchesResponse.documents.map((match: any) => {
       const otherUserId = match.user1_id === userId ? match.user2_id : match.user1_id;
       return {
         ...match,
@@ -468,34 +479,42 @@ export async function getAllUsersWithScores(userId: string) {
 
   try {
     // Get current user to check skills
-    const { data: currentProfile, error: profileError } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("user_id", userId)
-      .single();
+    const currentProfileResponse = await databases.listDocuments(
+      DB_ID,
+      PROFILES_COLLECTION,
+      [Query.equal("user_id", userId)]
+    );
 
-    if (profileError) throw profileError;
+    if (!currentProfileResponse.documents || currentProfileResponse.documents.length === 0) {
+      throw new Error("Profile not found");
+    }
 
     // Get current user's skills
-    const { data: offeredData } = await supabase
-      .from("user_skills_offered")
-      .select("skill:skills(*)")
-      .eq("user_id", userId);
+    const offeredResponse = await databases.listDocuments(
+      "USER_SKILLS_OFFERED_COLLECTION",
+      "user_id",
+      [Query.equal("user_id", userId)]
+    );
 
-    const { data: wantedData } = await supabase
-      .from("user_skills_wanted")
-      .select("skill:skills(*)")
-      .eq("user_id", userId);
+    const wantedResponse = await databases.listDocuments(
+      "USER_SKILLS_WANTED_COLLECTION",
+      "user_id",
+      [Query.equal("user_id", userId)]
+    );
 
     // Get all other users with their scores
-    const { data: matches, error: matchError } = await supabase
-      .from("matches")
-      .select("*")
-      .or(`user1_id.eq.${userId},user2_id.eq.${userId}`);
+    const matchesResponse = await databases.listDocuments(
+      DB_ID,
+      MATCHES_COLLECTION,
+      [
+        Query.or([
+          Query.equal("user1_id", userId),
+          Query.equal("user2_id", userId),
+        ]),
+      ]
+    );
 
-    if (matchError) throw matchError;
-
-    const matchScores = (matches || []).reduce((acc: any, m: any) => {
+    const matchScores = (matchesResponse.documents || []).reduce((acc: any, m: any) => {
       const otherUserId = m.user1_id === userId ? m.user2_id : m.user1_id;
       acc[otherUserId] = {
         score: m.match_score,
@@ -506,32 +525,33 @@ export async function getAllUsersWithScores(userId: string) {
     }, {});
 
     // Get all users
-    const { data: allProfiles, error: allError } = await supabase
-      .from("profiles")
-      .select("*")
-      .neq("user_id", userId);
-
-    if (allError) throw allError;
+    const allProfilesResponse = await databases.listDocuments(
+      DB_ID,
+      PROFILES_COLLECTION,
+      [Query.notEqual("user_id", userId)]
+    );
 
     // Add skills and scores to each user
     const usersWithDetails = await Promise.all(
-      (allProfiles || []).map(async (profile: any) => {
-        const { data: theirOffered } = await supabase
-          .from("user_skills_offered")
-          .select("skill:skills(*)")
-          .eq("user_id", profile.user_id);
+      (allProfilesResponse.documents || []).map(async (profile: any) => {
+        const theirOfferedResponse = await databases.listDocuments(
+          "USER_SKILLS_OFFERED_COLLECTION",
+          "user_id",
+          [Query.equal("user_id", profile.user_id)]
+        );
 
-        const { data: theirWanted } = await supabase
-          .from("user_skills_wanted")
-          .select("skill:skills(*)")
-          .eq("user_id", profile.user_id);
+        const theirWantedResponse = await databases.listDocuments(
+          "USER_SKILLS_WANTED_COLLECTION",
+          "user_id",
+          [Query.equal("user_id", profile.user_id)]
+        );
 
         const matchInfo = matchScores[profile.user_id] || { score: 0, type: "potential", reasons: [] };
 
         return {
           ...profile,
-          skills_offered: (theirOffered || []).map((item: any) => item.skill),
-          skills_wanted: (theirWanted || []).map((item: any) => item.skill),
+          skills_offered: (theirOfferedResponse.documents || []).map((item: any) => item.skill),
+          skills_wanted: (theirWantedResponse.documents || []).map((item: any) => item.skill),
           match_score: matchInfo.score,
           match_type: matchInfo.type,
           match_reasons: matchInfo.reasons,

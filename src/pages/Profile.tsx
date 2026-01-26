@@ -6,7 +6,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { supabase } from "@/integrations/supabase/client";
+import { databases } from "@/integrations/appwrite/client";
+import { DB_ID, PROFILES_COLLECTION } from "@/services/appwriteService";
 
 interface ProfileData {
   user_id: string;
@@ -45,25 +46,28 @@ export default function Profile() {
     if (!user?.id) return;
     setLoading(true);
     try {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("user_id", user.id)
-        .single();
+      const response = await databases.listDocuments(
+        DB_ID,
+        PROFILES_COLLECTION
+      );
 
-      if (error) {
-        console.error("Profile.loadProfile:", error);
-        return;
-      }
+      const profile = response.documents.find((doc: any) => doc.user_id === user.id);
 
-      if (data) {
-        setProfile(data as ProfileData);
+      if (profile) {
+        setProfile({
+          user_id: profile.user_id,
+          name: profile.name || "",
+          college: profile.college || "",
+          branch: profile.branch || "",
+          year: profile.year || "",
+          bio: profile.bio || "",
+        });
         setFormData({
-          name: data.name || "",
-          college: data.college || "",
-          branch: data.branch || "",
-          year: data.year || "",
-          bio: data.bio || "",
+          name: profile.name || "",
+          college: profile.college || "",
+          branch: profile.branch || "",
+          year: profile.year || "",
+          bio: profile.bio || "",
         });
       }
     } catch (error) {
@@ -78,20 +82,46 @@ export default function Profile() {
     setSaving(true);
 
     try {
-      const { error } = await supabase
-        .from("profiles")
-        .update({
-          name: formData.name,
-          college: formData.college,
-          branch: formData.branch,
-          year: formData.year,
-          bio: formData.bio,
-        })
-        .eq("user_id", user.id);
+      // Get existing profile
+      const response = await databases.listDocuments(
+        DB_ID,
+        PROFILES_COLLECTION
+      );
 
-      if (error) {
-        console.error("Profile.handleSaveProfile:", error);
-        return;
+      const existingProfile = response.documents.find((doc: any) => doc.user_id === user.id);
+
+      if (existingProfile) {
+        // Update existing profile
+        await databases.updateDocument(
+          DB_ID,
+          PROFILES_COLLECTION,
+          existingProfile.$id,
+          {
+            name: formData.name,
+            college: formData.college,
+            branch: formData.branch,
+            year: formData.year,
+            bio: formData.bio,
+            updated_at: new Date().toISOString(),
+          }
+        );
+      } else {
+        // Create new profile
+        await databases.createDocument(
+          DB_ID,
+          PROFILES_COLLECTION,
+          "unique()",
+          {
+            user_id: user.id,
+            name: formData.name,
+            college: formData.college,
+            branch: formData.branch,
+            year: formData.year,
+            bio: formData.bio,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          }
+        );
       }
 
       await loadProfile();
