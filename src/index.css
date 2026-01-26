@@ -1,0 +1,271 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Skill Swap Design System
+   - Light theme with off-white background
+   - Pastel blue primary with lavender/mint accents
+   - Glassmorphism cards with subtle animations
+*/
+
+@layer base {
+  :root {
+    /* Core colors */
+    --background: 240 20% 98%;
+    --foreground: 230 25% 15%;
+
+    /* Cards with glassmorphism */
+    --card: 0 0% 100%;
+    --card-foreground: 230 25% 15%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 230 25% 15%;
+
+    /* Primary - Pastel Blue */
+    --primary: 215 85% 65%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 215 90% 75%;
+
+    /* Secondary - Lavender */
+    --secondary: 270 60% 92%;
+    --secondary-foreground: 270 40% 35%;
+
+    /* Accent - Mint */
+    --accent: 165 60% 88%;
+    --accent-foreground: 165 50% 25%;
+
+    /* Muted */
+    --muted: 230 15% 94%;
+    --muted-foreground: 230 10% 45%;
+
+    /* Destructive */
+    --destructive: 0 75% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* Borders & inputs */
+    --border: 230 20% 90%;
+    --input: 230 20% 90%;
+    --ring: 215 85% 65%;
+
+    --radius: 1rem;
+
+    /* Match score colors */
+    --match-perfect: 15 90% 60%;
+    --match-strong: 45 90% 55%;
+    --match-good: 165 60% 45%;
+    --match-potential: 215 60% 60%;
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(215 85% 65%) 0%, hsl(270 60% 75%) 100%);
+    --gradient-card: linear-gradient(145deg, hsl(0 0% 100% / 0.9) 0%, hsl(240 20% 98% / 0.8) 100%);
+    --gradient-hero: linear-gradient(135deg, hsl(215 85% 65% / 0.1) 0%, hsl(165 60% 88% / 0.15) 50%, hsl(270 60% 92% / 0.1) 100%);
+    
+    /* Shadows */
+    --shadow-sm: 0 2px 8px -2px hsl(230 25% 15% / 0.08);
+    --shadow-md: 0 8px 24px -6px hsl(230 25% 15% / 0.12);
+    --shadow-lg: 0 16px 48px -12px hsl(230 25% 15% / 0.15);
+    --shadow-glow: 0 8px 32px -8px hsl(215 85% 65% / 0.35);
+
+    /* Sidebar */
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 230 25% 15%;
+    --sidebar-primary: 215 85% 65%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 20% 96%;
+    --sidebar-accent-foreground: 230 25% 15%;
+    --sidebar-border: 230 20% 92%;
+    --sidebar-ring: 215 85% 65%;
+  }
+
+  .dark {
+    --background: 230 25% 8%;
+    --foreground: 230 15% 95%;
+
+    --card: 230 25% 12%;
+    --card-foreground: 230 15% 95%;
+
+    --popover: 230 25% 12%;
+    --popover-foreground: 230 15% 95%;
+
+    --primary: 215 85% 65%;
+    --primary-foreground: 230 25% 8%;
+    --primary-glow: 215 90% 75%;
+
+    --secondary: 270 30% 25%;
+    --secondary-foreground: 270 60% 90%;
+
+    --accent: 165 40% 20%;
+    --accent-foreground: 165 60% 85%;
+
+    --muted: 230 20% 18%;
+    --muted-foreground: 230 15% 60%;
+
+    --destructive: 0 65% 45%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 230 20% 18%;
+    --input: 230 20% 18%;
+    --ring: 215 85% 65%;
+
+    --gradient-card: linear-gradient(145deg, hsl(230 25% 14% / 0.9) 0%, hsl(230 25% 10% / 0.8) 100%);
+    --gradient-hero: linear-gradient(135deg, hsl(215 85% 65% / 0.15) 0%, hsl(165 60% 45% / 0.1) 50%, hsl(270 40% 50% / 0.1) 100%);
+
+    --sidebar-background: 230 25% 10%;
+    --sidebar-foreground: 230 15% 95%;
+    --sidebar-primary: 215 85% 65%;
+    --sidebar-primary-foreground: 230 25% 8%;
+    --sidebar-accent: 230 20% 15%;
+    --sidebar-accent-foreground: 230 15% 95%;
+    --sidebar-border: 230 20% 15%;
+    --sidebar-ring: 215 85% 65%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Inter', sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    @apply font-bold tracking-tight;
+  }
+}
+
+@layer components {
+  /* Glassmorphism card */
+  .glass-card {
+    @apply rounded-2xl border border-border/50;
+    background: var(--gradient-card);
+    backdrop-filter: blur(12px);
+    box-shadow: var(--shadow-md);
+  }
+
+  /* Skill tag styles */
+  .skill-tag {
+    @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200;
+  }
+
+  .skill-tag-offered {
+    @apply bg-primary/15 text-primary hover:bg-primary/25;
+  }
+
+  .skill-tag-wanted {
+    @apply bg-accent text-accent-foreground hover:bg-accent/80;
+  }
+
+  /* Match score badges */
+  .match-badge {
+    @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-semibold;
+  }
+
+  .match-perfect {
+    background: linear-gradient(135deg, hsl(15 90% 95%) 0%, hsl(45 90% 95%) 100%);
+    color: hsl(15 80% 40%);
+  }
+
+  .match-strong {
+    background: hsl(45 90% 92%);
+    color: hsl(45 80% 35%);
+  }
+
+  .match-good {
+    background: hsl(165 60% 92%);
+    color: hsl(165 50% 30%);
+  }
+
+  /* Animated gradient background */
+  .gradient-bg {
+    background: var(--gradient-hero);
+  }
+
+  /* Button glow effect */
+  .btn-glow {
+    box-shadow: var(--shadow-glow);
+    transition: all 0.3s ease;
+  }
+
+  .btn-glow:hover {
+    box-shadow: 0 12px 40px -8px hsl(215 85% 65% / 0.45);
+    transform: translateY(-2px);
+  }
+
+  /* Skeleton loader */
+  .skeleton {
+    @apply animate-pulse bg-muted rounded-lg;
+  }
+}
+
+@layer utilities {
+  /* Animations */
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-out forwards;
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.5s ease-out forwards;
+  }
+
+  .animate-scale-in {
+    animation: scaleIn 0.3s ease-out forwards;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes slideUp {
+    from { 
+      opacity: 0; 
+      transform: translateY(20px); 
+    }
+    to { 
+      opacity: 1; 
+      transform: translateY(0); 
+    }
+  }
+
+  @keyframes scaleIn {
+    from { 
+      opacity: 0; 
+      transform: scale(0.95); 
+    }
+    to { 
+      opacity: 1; 
+      transform: scale(1); 
+    }
+  }
+
+  /* Stagger animations for children */
+  .stagger-children > * {
+    opacity: 0;
+    animation: slideUp 0.5s ease-out forwards;
+  }
+
+  .stagger-children > *:nth-child(1) { animation-delay: 0ms; }
+  .stagger-children > *:nth-child(2) { animation-delay: 100ms; }
+  .stagger-children > *:nth-child(3) { animation-delay: 200ms; }
+  .stagger-children > *:nth-child(4) { animation-delay: 300ms; }
+  .stagger-children > *:nth-child(5) { animation-delay: 400ms; }
+}
