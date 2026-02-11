@@ -187,7 +187,15 @@
 
   /* Animated gradient background */
   .gradient-bg {
-    background: var(--gradient-hero);
+    position: relative;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(circle at 0% 0%, hsl(215 85% 72% / 0.18), transparent 55%),
+      radial-gradient(circle at 100% 20%, hsl(270 60% 80% / 0.18), transparent 55%),
+      radial-gradient(circle at 50% 100%, hsl(165 60% 80% / 0.18), transparent 55%),
+      linear-gradient(135deg, hsl(230 20% 99%) 0%, hsl(215 40% 97%) 35%, hsl(260 40% 98%) 100%);
+    background-size: 140% 140%;
+    animation: gradientShift 18s ease-in-out infinite;
   }
 
   /* Button glow effect */
@@ -254,6 +262,19 @@
     to { 
       opacity: 1; 
       transform: scale(1); 
+    }
+  }
+
+  /* Slow background gradient motion for gradient-bg */
+  @keyframes gradientShift {
+    0% {
+      background-position: 0% 0%;
+    }
+    50% {
+      background-position: 100% 100%;
+    }
+    100% {
+      background-position: 0% 0%;
     }
   }
 

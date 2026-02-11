@@ -1,49 +1,268 @@
 # Skill Swap
 
-Minimal README for local development and deployment.
+Skill Swap is a student‑focused skill‑exchange app. Students create a profile, list skills they can **teach** and **want to learn**, and get matched with other students for chat‑based exchanges.
+
+The current version is completely **backend‑less** in terms of external services – all data is stored locally in the browser as JSON using `localStorage`, which makes it ideal for demos, prototyping, and offline use.
+
+---
+
+## Features
+
+### Core user flows
+
+- **Authentication (local JSON)**
+  - Email + password sign up and sign in.
+  - Session is remembered in `localStorage` on the same browser.
+
+- **Profile management**
+  - Personal info: name, college, branch, year, bio.
+  - **Year selector**: dropdown with `1st year`, `2nd year`, `3rd year`, `4th year`, and `Pass-out` (only one value at a time).
+  - Read‑only email field sourced from authentication.
+  - Profile completeness flag (`is_profile_complete`) persisted.
+
+- **Skills (teach / learn)**
+  - Separate lists for:
+    - **Skills you can teach** (e.g. React, UI design).
+    - **Skills you want to learn** (e.g. TypeScript, public speaking).
+  - Add skills via input + “Add” button or Enter key.
+  - Remove a skill by clicking its chip.
+  - Skills are stored on the profile as:
+    - `skills_teach: string[]`
+    - `skills_learn: string[]`
+
+- **Matching algorithm**
+  - Matches users based on:
+    - Complementary skills (what you teach vs what they want, and vice versa).
+    - Shared college, year, and branch.
+  - Produces:
+    - **Score** from 0–100.
+    - **Match type**: `perfect`, `strong`, `good`, `potential`.
+    - Human‑readable **reasons** (e.g. “Mutual: Both teach and learn React”).
+    - Lists of mutual and one‑way skill matches.
+  - Matches are stored locally and reused by browse/matches/chat.
+
+- **Browse & search profiles**
+  - Browse all other profiles in a responsive grid.
+  - Search by **name** or **college**.
+  - Filter by:
+    - Minimum match score (slider).
+    - “Only exact matches” toggle (mutual skill matches only).
+  - **Works even if you have no matches yet** – you can still search and view other profiles as long as they exist.
+
+- **Matches**
+  - List of users with whom you have generated matches.
+  - Shows:
+    - Match score and type.
+    - Key reasons for the match.
+    - Skills they can teach and want to learn.
+
+- **Chat**
+  - Conversation list with last message preview and unread counts.
+  - Full chat window with:
+    - Grouped messages by day.
+    - Timestamps (“Today 3:20 PM”, “Yesterday …”).
+    - Typing indicator stub (UI only; local backend logs typing events to console).
+  - Messages are stored locally per conversation; read/unread state is persisted.
+
+### UI & UX
+
+- **Design system**
+  - Tailwind CSS + custom design tokens defined in `src/index.css`.
+  - Primary palette: pastel blue, lavender, and mint.
+  - Glassmorphism cards (`.glass-card`), glowing hero buttons, and subtle shadows.
+
+- **Layout**
+  - `Navbar` with:
+    - Desktop top bar (logo, nav buttons, avatar dropdown).
+    - Mobile top bar with slide‑in menu.
+    - Mobile bottom nav bar with icons.
+  - Pages use a shared **animated gradient background** (`.gradient-bg`).
+
+- **Animations**
+  - Framer Motion for page, card, and chat message animations.
+  - Tailwind utilities for fade/slide/scale‑in on page sections.
+
+---
+
+## Architecture
+
+### Frontend
+
+- **Framework**: React 18 + TypeScript.
+- **Bundler**: Vite.
+- **Routing**: `react-router-dom`.
+- **State / data**:
+  - React Query for network‑style data flows (currently used in parts of the app).
+  - Custom hooks for conversations, messages, typing indicators, and auth.
+
+### Local JSON “backend”
+
+All persistent data is stored in the browser using `localStorage`, abstracted by `src/services/localDb.ts`. The schema looks like this:
+
+- `users`: `{ id, email, name, password }[]`
+- `profiles`: `Profile[]` (see `src/types/index.ts`)
+- `matches`: `LocalMatch[]`
+- `conversations`: `{ id, match_id, created_at }[]`
+- `messages`: `{ id, conversation_id, sender_id, content, is_read, created_at }[]`
+
+The main services that use this local DB:
+
+- `src/contexts/AuthContext.tsx`
+  - Handles sign up/sign in/sign out via `localDb` (`localSignUp`, `localSignIn`, `localSignOut`).
+  - Restores current user from a session key in `localStorage`.
+
+- `src/pages/Profile.tsx`
+  - Loads / saves profile using `getProfileByUserId` and `upsertProfile`.
+
+- `src/services/matchService.ts`
+  - Reads profiles and their `skills_teach` / `skills_learn` to compute match scores.
+  - Persists match results in local JSON (`readMatches`, `writeMatches`).
+  - Exposes:
+    - `generateMatchesForUser(userId)`
+    - `getUserMatches(userId)`
+    - `getAllUsersWithScores(userId)`
+
+- `src/services/appwriteService.ts` (now local)
+  - Reimplemented to use the same JSON DB instead of Appwrite:
+    - `fetchConversationsForUser`
+    - `fetchMessagesForConversation`
+    - `markMessagesRead`
+    - `sendMessageToConversation`
+  - `createMessagesChannel` / `removeChannel` return dummy values and act as no‑ops for realtime (sufficient for single‑device use).
+
+> **Note:** The old Appwrite integration code is still present but unused. The app runs fully against `localDb` by default.
+
+---
 
 ## Running the app locally
 
-Install dependencies and start the dev server:
+### Prerequisites
+
+- Node.js 18+ (recommended).
+- npm (comes with Node).
+
+### Install dependencies
 
 ```bash
 npm install
+```
+
+### Start the dev server
+
+```bash
 npm run dev
 ```
 
-Open http://localhost:5173 in your browser.
+Then open `http://localhost:5173` in your browser.
 
-## Deployment
-
-This project can be deployed to Vercel or any static hosting that supports Vite builds. To build for production:
+### Build & preview production bundle
 
 ```bash
 npm run build
 npm run preview
 ```
 
-## API Endpoints
+The build output is written to the `dist/` folder.
 
-- `GET /api/health` — Health check endpoint.
-- `GET /api/items` — List items.
-- `GET /api/items/:id` — Get item details.
+---
 
-## Environment
+## Data storage & resetting
 
-When integrating with Supabase, set your environment variables (example):
+Because the backend is fully local:
 
-```
-VITE_SUPABASE_URL=https://your-supabase-url
-VITE_SUPABASE_PUBLISHABLE_KEY=your-anon-key
-```
+- All data is **stored per browser/device**.
+- Clearing **site data** or **localStorage** will reset the app to a fresh state.
 
-## Stack
+To reset manually in the browser:
 
-- Vite
-- TypeScript
-- React
-- Tailwind CSS
+1. Open DevTools → Application (or Storage) tab.
+2. Under **Local Storage**, find your app’s origin.
+3. Delete keys starting with:
+   - `skill_swap_local_db_v1`
+   - `skill_swap_session_user_id`
 
-## Notes
+---
 
-- This project was generated from a template. References to external generator tooling have been removed.
+## Deployment
+
+The app is a standard Vite SPA and can be deployed as a static site.
+
+- **Build command**: `npm run build`
+- **Output directory**: `dist`
+
+### Vercel
+
+- `vercel.json` is included and configured to:
+  - Run `npm run build`.
+  - Serve from `dist`.
+- `VERCEL_DEPLOYMENT.md` contains a detailed step‑by‑step guide.
+
+### Render
+
+- `render.yaml` is included for a static site:
+  - `buildCommand: npm run build`
+  - `staticPublishPath: dist`
+
+### SPA routing
+
+- `public/_redirects` is configured to route all paths to `index.html`:
+  - `/* /index.html 200`
+
+---
+
+## API endpoints (demo only)
+
+The project still includes a small demo API under `/api` for examples/prototyping:
+
+- `GET /api/health` — Health check.
+- `GET /api/items` — Returns a list of mock items.
+- `GET /api/items/:id` — Returns a single mock item by ID.
+
+These endpoints are **not** used by the main Skill Swap flows; they’re only illustrative.
+
+---
+
+## Tech stack
+
+- **Language**: TypeScript
+- **Framework**: React 18
+- **Build tool**: Vite
+- **Styling**:
+  - Tailwind CSS
+  - Custom CSS design system (`src/index.css`)
+- **UI components**:
+  - Shadcn‑style UI components in `src/components/ui`
+  - Lucide icons
+- **Animations**:
+  - Framer Motion
+- **State / data**:
+  - React Query (for async data patterns)
+  - Custom hooks for auth, conversations, messages, typing indicator
+
+---
+
+## Limitations & future improvements
+
+- **Single‑device only**:
+  - All data lives in the browser; there is no shared backend.
+  - Two different devices/browsers will not see each other’s profiles or messages.
+
+- **Security**:
+  - Passwords are stored in plain text in local JSON – acceptable for a prototype but **not** for production.
+
+- **Realtime**:
+  - Typing indicators and message subscriptions are local stubs; there is no cross‑device realtime.
+
+### Possible next steps
+
+- Replace local JSON storage with a real backend (e.g. Appwrite, Supabase, or custom Node/Express + database).
+- Implement proper authentication with hashed passwords and tokens.
+- Add image upload for avatars and richer profile fields (links, tags).
+- Improve skill management with autocomplete and shared skill catalog.
+- Add notifications and more advanced match workflows (accept/reject/invite).
+
+---
+
+## License
+
+This project is intended as a learning/prototype project. Add a license here if you plan to publish or share it more broadly.

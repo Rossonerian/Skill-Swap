@@ -1,7 +1,12 @@
-import { databases } from "@/integrations/appwrite/client";
-import { Query } from "appwrite";
 import { Skill, Profile } from "@/types";
-import { DB_ID, PROFILES_COLLECTION, MATCHES_COLLECTION } from "@/services/appwriteService";
+import {
+  listProfilesExcept,
+  listProfilesByUserIds,
+  getProfileByUserId,
+  readMatches,
+  writeMatches,
+  generateId,
+} from "@/services/localDb";
 
 /**
  * Normalize skill names for comparison
@@ -242,59 +247,51 @@ export async function generateMatchesForUser(userId: string): Promise<number> {
   if (!userId) return 0;
 
   try {
-    // Get current user's profile and skills
-    const profilesResponse = await databases.listDocuments(
-      DB_ID,
-      PROFILES_COLLECTION,
-      [Query.equal("user_id", userId)]
-    );
-
-    const currentProfile = profilesResponse.documents[0];
+    // Get current user's profile and skills from local JSON
+    const currentProfile = getProfileByUserId(userId) as any;
 
     if (!currentProfile) {
       console.warn("matchService.generateMatchesForUser: no profile found");
       return 0;
     }
 
-    // Get user's offered skills
-    const offeredResponse = await databases.listDocuments(
-      "USER_SKILLS_OFFERED_COLLECTION", // Replace with actual collection ID
-      "user_id",
-      [Query.equal("user_id", userId)]
+    const currentUserTeaches: MatchDetail[] = (currentProfile.skills_teach || []).map(
+      (name: string) => ({
+        skill: {
+          id: name.toLowerCase(),
+          name,
+          category: null,
+          popularity_count: 0,
+          created_at: "",
+        } as Skill,
+        normalizedName: normalizeSkillName(name),
+        direction: "teaches" as const,
+      }),
     );
 
-    // Get user's wanted skills
-    const wantedResponse = await databases.listDocuments(
-      "USER_SKILLS_WANTED_COLLECTION", // Replace with actual collection ID
-      "user_id",
-      [Query.equal("user_id", userId)]
+    const currentUserWants: MatchDetail[] = (currentProfile.skills_learn || []).map(
+      (name: string) => ({
+        skill: {
+          id: name.toLowerCase(),
+          name,
+          category: null,
+          popularity_count: 0,
+          created_at: "",
+        } as Skill,
+        normalizedName: normalizeSkillName(name),
+        direction: "wants" as const,
+      }),
     );
-
-    const currentUserTeaches: MatchDetail[] = (offeredResponse.documents || []).map((item: any) => ({
-      skill: item.skill,
-      normalizedName: normalizeSkillName(item.skill.name),
-      direction: "teaches" as const,
-    }));
-
-    const currentUserWants: MatchDetail[] = (wantedResponse.documents || []).map((item: any) => ({
-      skill: item.skill,
-      normalizedName: normalizeSkillName(item.skill.name),
-      direction: "wants" as const,
-    }));
 
     // If user has no skills, no matches possible
     if (currentUserTeaches.length === 0 && currentUserWants.length === 0) {
       return 0;
     }
 
-    // Get all other users
-    const allProfilesResponse = await databases.listDocuments(
-      DB_ID,
-      PROFILES_COLLECTION,
-      [Query.notEqual("user_id", userId)]
-    );
+    // Get all other users from local profiles
+    const otherProfiles = listProfilesExcept(userId) as any[];
 
-    if (!allProfilesResponse.documents || allProfilesResponse.documents.length === 0) {
+    if (!otherProfiles || otherProfiles.length === 0) {
       return 0;
     }
 
@@ -302,32 +299,35 @@ export async function generateMatchesForUser(userId: string): Promise<number> {
     let matchCount = 0;
     const matchesToInsert = [];
 
-    for (const otherProfile of allProfilesResponse.documents) {
+    for (const otherProfile of otherProfiles) {
       try {
-        // Get other user's skills
-        const otherOfferedResponse = await databases.listDocuments(
-          "USER_SKILLS_OFFERED_COLLECTION",
-          "user_id",
-          [Query.equal("user_id", otherProfile.user_id)]
+        const otherUserTeaches: MatchDetail[] = (otherProfile.skills_teach || []).map(
+          (name: string) => ({
+            skill: {
+              id: name.toLowerCase(),
+              name,
+              category: null,
+              popularity_count: 0,
+              created_at: "",
+            } as Skill,
+            normalizedName: normalizeSkillName(name),
+            direction: "teaches" as const,
+          }),
         );
 
-        const otherWantedResponse = await databases.listDocuments(
-          "USER_SKILLS_WANTED_COLLECTION",
-          "user_id",
-          [Query.equal("user_id", otherProfile.user_id)]
+        const otherUserWants: MatchDetail[] = (otherProfile.skills_learn || []).map(
+          (name: string) => ({
+            skill: {
+              id: name.toLowerCase(),
+              name,
+              category: null,
+              popularity_count: 0,
+              created_at: "",
+            } as Skill,
+            normalizedName: normalizeSkillName(name),
+            direction: "wants" as const,
+          }),
         );
-
-        const otherUserTeaches: MatchDetail[] = (otherOfferedResponse.documents || []).map((item: any) => ({
-          skill: item.skill,
-          normalizedName: normalizeSkillName(item.skill.name),
-          direction: "teaches" as const,
-        }));
-
-        const otherUserWants: MatchDetail[] = (otherWantedResponse.documents || []).map((item: any) => ({
-          skill: item.skill,
-          normalizedName: normalizeSkillName(item.skill.name),
-          direction: "wants" as const,
-        }));
 
         // Calculate score
         const matchScore = calculateMatchScore(
@@ -369,43 +369,42 @@ export async function generateMatchesForUser(userId: string): Promise<number> {
       return 0;
     }
 
-    // Upsert matches
-    for (const match of matchesToInsert) {
-      try {
-        // Check if match already exists
-        const existingMatches = await databases.listDocuments(
-          DB_ID,
-          MATCHES_COLLECTION,
-          [
-            Query.equal("user1_id", match.user1_id),
-            Query.equal("user2_id", match.user2_id),
-          ]
-        );
+    // Upsert matches in local JSON
+    const existingMatches = readMatches();
+    for (const match of matchesToInsert as any[]) {
+      const existing = existingMatches.find(
+        (m) =>
+          (m.user1_id === match.user1_id && m.user2_id === match.user2_id) ||
+          (m.user1_id === match.user2_id && m.user2_id === match.user1_id),
+      );
 
-        if (existingMatches.documents.length > 0) {
-          // Update existing match
-          await databases.updateDocument(
-            DB_ID,
-            MATCHES_COLLECTION,
-            existingMatches.documents[0].$id,
-            match
-          );
-        } else {
-          // Create new match
-          await databases.createDocument(
-            DB_ID,
-            MATCHES_COLLECTION,
-            "unique()",
-            match
-          );
-        }
-        matchCount++;
-      } catch (error) {
-        console.error("matchService.generateMatchesForUser: error upserting match:", error);
-        continue;
+      if (existing) {
+        existing.match_score = match.match_score;
+        existing.match_type = match.match_type;
+        existing.match_reasons = match.match_reasons;
+        existing.match_mutual_skills = match.match_mutual_skills;
+        existing.match_one_way_for_user = match.match_one_way_for_user;
+        existing.match_one_way_from_user = match.match_one_way_from_user;
+        existing.status = "accepted";
+      } else {
+        existingMatches.push({
+          id: generateId("match"),
+          user1_id: match.user1_id,
+          user2_id: match.user2_id,
+          match_score: match.match_score,
+          match_type: match.match_type,
+          match_reasons: match.match_reasons,
+          match_mutual_skills: match.match_mutual_skills,
+          match_one_way_for_user: match.match_one_way_for_user,
+          match_one_way_from_user: match.match_one_way_from_user,
+          status: "accepted",
+          created_at: new Date().toISOString(),
+        });
       }
+      matchCount++;
     }
 
+    writeMatches(existingMatches);
     return matchCount;
   } catch (error) {
     console.error("matchService.generateMatchesForUser: unexpected error:", error);
@@ -427,42 +426,54 @@ export async function getUserMatches(userId: string) {
   if (!userId) return [];
 
   try {
-    const matchesResponse = await databases.listDocuments(
-      DB_ID,
-      MATCHES_COLLECTION,
-      [
-        Query.or([
-          Query.equal("user1_id", userId),
-          Query.equal("user2_id", userId),
-        ]),
-        Query.greaterThanEqual("match_score", 0),
-        Query.orderDesc("match_score"),
-      ]
-    );
+    const matches = readMatches()
+      .filter((m) => (m.user1_id === userId || m.user2_id === userId) && m.match_score >= 0)
+      .sort((a, b) => b.match_score - a.match_score);
 
-    if (!matchesResponse.documents || matchesResponse.documents.length === 0) return [];
+    if (!matches.length) return [];
 
-    const matchedUserIds = matchesResponse.documents.map((m: any) =>
-      m.user1_id === userId ? m.user2_id : m.user1_id
-    );
-
-    const profilesResponse = await databases.listDocuments(
-      DB_ID,
-      PROFILES_COLLECTION,
-      [Query.equal("user_id", matchedUserIds)]
-    );
-
-    const profileMap = (profilesResponse.documents || []).reduce((acc: any, p: any) => {
+    const matchedUserIds = matches.map((m) => (m.user1_id === userId ? m.user2_id : m.user1_id));
+    const profiles = listProfilesByUserIds(matchedUserIds);
+    const profileMap = (profiles || []).reduce((acc: any, p: any) => {
       acc[p.user_id] = p;
       return acc;
     }, {});
 
-    // Enrich matches with profile data
-    return matchesResponse.documents.map((match: any) => {
+    // Enrich matches with profile data, including derived skill objects
+    return matches.map((match) => {
       const otherUserId = match.user1_id === userId ? match.user2_id : match.user1_id;
+      const profile = profileMap[otherUserId];
+
+      if (!profile) {
+        return {
+          ...match,
+          otherProfile: undefined,
+        };
+      }
+
+      const skills_offered: Skill[] = (profile.skills_teach || []).map((name: string) => ({
+        id: name.toLowerCase(),
+        name,
+        category: null,
+        popularity_count: 0,
+        created_at: "",
+      }));
+
+      const skills_wanted: Skill[] = (profile.skills_learn || []).map((name: string) => ({
+        id: name.toLowerCase(),
+        name,
+        category: null,
+        popularity_count: 0,
+        created_at: "",
+      }));
+
       return {
         ...match,
-        otherProfile: profileMap[otherUserId],
+        otherProfile: {
+          ...profile,
+          skills_offered,
+          skills_wanted,
+        },
       };
     });
   } catch (error) {
@@ -478,43 +489,14 @@ export async function getAllUsersWithScores(userId: string) {
   if (!userId) return [];
 
   try {
-    // Get current user to check skills
-    const currentProfileResponse = await databases.listDocuments(
-      DB_ID,
-      PROFILES_COLLECTION,
-      [Query.equal("user_id", userId)]
+    // Get all users except current
+    const allProfiles = listProfilesExcept(userId) as any[];
+
+    const matches = readMatches().filter(
+      (m) => m.user1_id === userId || m.user2_id === userId,
     );
 
-    if (!currentProfileResponse.documents || currentProfileResponse.documents.length === 0) {
-      throw new Error("Profile not found");
-    }
-
-    // Get current user's skills
-    const offeredResponse = await databases.listDocuments(
-      "USER_SKILLS_OFFERED_COLLECTION",
-      "user_id",
-      [Query.equal("user_id", userId)]
-    );
-
-    const wantedResponse = await databases.listDocuments(
-      "USER_SKILLS_WANTED_COLLECTION",
-      "user_id",
-      [Query.equal("user_id", userId)]
-    );
-
-    // Get all other users with their scores
-    const matchesResponse = await databases.listDocuments(
-      DB_ID,
-      MATCHES_COLLECTION,
-      [
-        Query.or([
-          Query.equal("user1_id", userId),
-          Query.equal("user2_id", userId),
-        ]),
-      ]
-    );
-
-    const matchScores = (matchesResponse.documents || []).reduce((acc: any, m: any) => {
+    const matchScores = matches.reduce((acc: any, m: any) => {
       const otherUserId = m.user1_id === userId ? m.user2_id : m.user1_id;
       acc[otherUserId] = {
         score: m.match_score,
@@ -524,40 +506,35 @@ export async function getAllUsersWithScores(userId: string) {
       return acc;
     }, {});
 
-    // Get all users
-    const allProfilesResponse = await databases.listDocuments(
-      DB_ID,
-      PROFILES_COLLECTION,
-      [Query.notEqual("user_id", userId)]
-    );
+    // Add skills and scores to each user, deriving skills from profile
+    const usersWithDetails = (allProfiles || []).map((profile: any) => {
+      const matchInfo = matchScores[profile.user_id] || {
+        score: 0,
+        type: "potential",
+        reasons: [] as string[],
+      };
 
-    // Add skills and scores to each user
-    const usersWithDetails = await Promise.all(
-      (allProfilesResponse.documents || []).map(async (profile: any) => {
-        const theirOfferedResponse = await databases.listDocuments(
-          "USER_SKILLS_OFFERED_COLLECTION",
-          "user_id",
-          [Query.equal("user_id", profile.user_id)]
-        );
-
-        const theirWantedResponse = await databases.listDocuments(
-          "USER_SKILLS_WANTED_COLLECTION",
-          "user_id",
-          [Query.equal("user_id", profile.user_id)]
-        );
-
-        const matchInfo = matchScores[profile.user_id] || { score: 0, type: "potential", reasons: [] };
-
-        return {
-          ...profile,
-          skills_offered: (theirOfferedResponse.documents || []).map((item: any) => item.skill),
-          skills_wanted: (theirWantedResponse.documents || []).map((item: any) => item.skill),
-          match_score: matchInfo.score,
-          match_type: matchInfo.type,
-          match_reasons: matchInfo.reasons,
-        };
-      })
-    );
+      return {
+        ...profile,
+        skills_offered: (profile.skills_teach || []).map((name: string) => ({
+          id: name.toLowerCase(),
+          name,
+          category: null,
+          popularity_count: 0,
+          created_at: "",
+        })) as Skill[],
+        skills_wanted: (profile.skills_learn || []).map((name: string) => ({
+          id: name.toLowerCase(),
+          name,
+          category: null,
+          popularity_count: 0,
+          created_at: "",
+        })) as Skill[],
+        match_score: matchInfo.score,
+        match_type: matchInfo.type,
+        match_reasons: matchInfo.reasons,
+      };
+    });
 
     return usersWithDetails;
   } catch (error) {

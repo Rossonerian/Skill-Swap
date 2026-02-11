@@ -1,9 +1,16 @@
-import { databases } from "@/integrations/appwrite/client";
-import { Query, Client } from "appwrite";
-import { default as client } from "@/integrations/appwrite/client";
+import {
+  readMatches,
+  readConversations,
+  readMessages,
+  writeMessages,
+  writeConversations,
+  listProfilesByUserIds,
+  generateId,
+  ensureConversationForMatch,
+} from "@/services/localDb";
 
-// Database collection IDs (these should match your Appwrite setup)
-export const DB_ID = import.meta.env.VITE_APPWRITE_DATABASE_ID || "main";
+// Dummy IDs kept for backwards compatibility with other imports
+export const DB_ID = "local-json-db";
 export const CONVERSATIONS_COLLECTION = "conversations";
 export const MESSAGES_COLLECTION = "messages";
 export const PROFILES_COLLECTION = "profiles";
@@ -13,83 +20,47 @@ export async function fetchConversationsForUser(userId: string) {
   if (!userId) return [];
 
   try {
-    // Get all matches where user is involved
-    const matches = await databases.listDocuments(
-      DB_ID,
-      MATCHES_COLLECTION,
-      [
-        Query.or([
-          Query.equal("user1_id", userId),
-          Query.equal("user2_id", userId),
-        ]),
-        Query.equal("status", "accepted"),
-      ]
+    const matches = readMatches().filter(
+      (m) => (m.user1_id === userId || m.user2_id === userId) && m.status === "accepted",
     );
+    if (!matches.length) return [];
 
-    if (!matches.documents || matches.documents.length === 0) return [];
+    const conversations = readConversations();
+    const messages = readMessages();
 
-    const matchIds = matches.documents.map((m: any) => m.$id);
+    const matchIds = new Set(matches.map((m) => m.id));
+    const convosForUser = conversations.filter((c) => matchIds.has(c.match_id));
 
-    // Get conversations for these matches
-    const convos = await databases.listDocuments(
-      DB_ID,
-      CONVERSATIONS_COLLECTION,
-      [Query.equal("match_id", matchIds)]
+    const otherUserIds = matches.map((m) =>
+      m.user1_id === userId ? m.user2_id : m.user1_id,
     );
-
-    if (!convos.documents || convos.documents.length === 0) return [];
-
-    const otherUserIds = matches.documents.map((m: any) =>
-      m.user1_id === userId ? m.user2_id : m.user1_id
-    );
-
-    // Get profiles of other users
-    const profiles = await databases.listDocuments(
-      DB_ID,
-      PROFILES_COLLECTION,
-      [Query.equal("user_id", otherUserIds)]
-    );
-
-    const profileMap = (profiles.documents || []).reduce((acc: any, p: any) => {
+    const profiles = listProfilesByUserIds(otherUserIds);
+    const profileMap = (profiles || []).reduce((acc: any, p: any) => {
       acc[p.user_id] = p;
       return acc;
     }, {});
 
-    const conversationsWithDetails: any[] = [];
-
-    for (const convo of convos.documents) {
-      const match = matches.documents.find((m: any) => m.$id === convo.match_id);
-      if (!match) continue;
+    const conversationsWithDetails = convosForUser.map((convo) => {
+      const match = matches.find((m) => m.id === convo.match_id);
+      if (!match) return null;
 
       const otherUserId = match.user1_id === userId ? match.user2_id : match.user1_id;
       const otherProfile = profileMap[otherUserId];
 
-      // Get last message
-      const messages = await databases.listDocuments(
-        DB_ID,
-        MESSAGES_COLLECTION,
-        [
-          Query.equal("conversation_id", convo.$id),
-          Query.orderDesc("created_at"),
-          Query.limit(1),
-        ]
-      );
+      const convoMessages = messages
+        .filter((m) => m.conversation_id === convo.id)
+        .sort(
+          (a, b) =>
+            new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
+        );
 
-      const lastMsg = messages.documents?.[0] || null;
+      const lastMsg = convoMessages[convoMessages.length - 1] || null;
+      const unreadCount = convoMessages.filter(
+        (m) => !m.is_read && m.sender_id !== userId,
+      ).length;
 
-      // Get unread count
-      const unreadMessages = await databases.listDocuments(
-        DB_ID,
-        MESSAGES_COLLECTION,
-        [
-          Query.equal("conversation_id", convo.$id),
-          Query.equal("is_read", false),
-          Query.notEqual("sender_id", userId),
-        ]
-      );
-
-      conversationsWithDetails.push({
-        id: convo.$id,
+      return {
+        id: convo.id,
         match_id: convo.match_id,
         created_at: convo.created_at,
         other_user: {
@@ -106,11 +77,10 @@ export async function fetchConversationsForUser(userId: string) {
               is_read: lastMsg.is_read,
             }
           : null,
-        unread_count: unreadMessages.total || 0,
-      });
-    }
+        unread_count: unreadCount,
+      };
+    }).filter(Boolean) as any[];
 
-    // Sort by last message time
     conversationsWithDetails.sort((a, b) => {
       const aTime = a.last_message?.created_at || a.created_at;
       const bTime = b.last_message?.created_at || b.created_at;
@@ -127,19 +97,14 @@ export async function fetchConversationsForUser(userId: string) {
 export async function fetchMessagesForConversation(conversationId: string) {
   if (!conversationId) return [];
   try {
-    const response = await databases.listDocuments(
-      DB_ID,
-      MESSAGES_COLLECTION,
-      [
-        Query.equal("conversation_id", conversationId),
-        Query.orderAsc("created_at"),
-      ]
-    );
+    const messages = readMessages()
+      .filter((m) => m.conversation_id === conversationId)
+      .sort(
+        (a, b) =>
+          new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
+      );
 
-    return (response.documents || []).map((doc: any) => ({
-      id: doc.$id,
-      ...doc,
-    }));
+    return messages.map((m) => ({ ...m }));
   } catch (error) {
     console.error("appwriteService.fetchMessagesForConversation:", error);
     return [];
@@ -149,23 +114,20 @@ export async function fetchMessagesForConversation(conversationId: string) {
 export async function markMessagesRead(conversationId: string, userId: string) {
   if (!conversationId || !userId) return;
   try {
-    const messages = await databases.listDocuments(
-      DB_ID,
-      MESSAGES_COLLECTION,
-      [
-        Query.equal("conversation_id", conversationId),
-        Query.equal("is_read", false),
-        Query.notEqual("sender_id", userId),
-      ]
-    );
-
-    for (const msg of messages.documents) {
-      await databases.updateDocument(
-        DB_ID,
-        MESSAGES_COLLECTION,
-        msg.$id,
-        { is_read: true }
-      );
+    const messages = readMessages();
+    let changed = false;
+    for (const msg of messages) {
+      if (
+        msg.conversation_id === conversationId &&
+        !msg.is_read &&
+        msg.sender_id !== userId
+      ) {
+        msg.is_read = true;
+        changed = true;
+      }
+    }
+    if (changed) {
+      writeMessages(messages);
     }
   } catch (error) {
     console.error("appwriteService.markMessagesRead:", error);
@@ -179,18 +141,16 @@ export async function sendMessageToConversation(
 ) {
   if (!conversationId || !userId || !content) return false;
   try {
-    await databases.createDocument(
-      DB_ID,
-      MESSAGES_COLLECTION,
-      "unique()",
-      {
-        conversation_id: conversationId,
-        sender_id: userId,
-        content: content.trim(),
-        is_read: false,
-        created_at: new Date().toISOString(),
-      }
-    );
+    const messages = readMessages();
+    messages.push({
+      id: generateId("msg"),
+      conversation_id: conversationId,
+      sender_id: userId,
+      content: content.trim(),
+      is_read: false,
+      created_at: new Date().toISOString(),
+    });
+    writeMessages(messages);
 
     return true;
   } catch (error) {
@@ -199,34 +159,23 @@ export async function sendMessageToConversation(
   }
 }
 
+export async function ensureConversationForMatchId(matchId: string) {
+  return ensureConversationForMatch(matchId);
+}
+
 export function createMessagesChannel(
   conversationId: string,
   onInsert: (payload: any) => void
 ) {
-  // Subscribe to database realtime updates for messages collection
-  const unsubscribe = client.subscribe(
-    [`databases.${DB_ID}.collections.${MESSAGES_COLLECTION}.documents`],
-    (response: any) => {
-      // Emit events for message inserts in this conversation
-      if (response.events.some((e: string) => e.includes(".create"))) {
-        const payload = response.payload;
-        if (payload && payload.conversation_id === conversationId) {
-          onInsert(payload);
-        }
-      }
-    }
-  );
-
-  return unsubscribe as unknown as string;
+  // Local JSON backend doesn't support realtime multi-user updates,
+  // so we simply return a dummy subscription id. The caller will
+  // refetch messages after sending.
+  return `local-messages:${conversationId}`;
 }
 
 export function removeChannel(subscription: string) {
-  try {
-    // Appwrite client unsubscribe
-    client.unsubscribe(subscription);
-  } catch (error) {
-    console.error("appwriteService.removeChannel:", error);
-  }
+  // No-op for local backend
+  void subscription;
 }
 
 export function createTypingChannel(

@@ -12,6 +12,7 @@ import { EmptyState } from "@/components/EmptyState";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { getUserMatches } from "@/services/matchService";
+import { ensureConversationForMatchId } from "@/services/appwriteService";
 import { Match } from "@/types";
 import { cn } from "@/lib/utils";
 
@@ -68,9 +69,9 @@ export default function Matches() {
     if (!user?.id || !match.id) return;
 
     try {
-      // For now, just navigate to chat with the match info
-      // The chat page will handle creating a conversation if needed
-      navigate(`/chat?matchId=${match.id}`);
+      // Ensure there is a conversation for this match and navigate directly to it
+      const convo = await ensureConversationForMatchId(match.id);
+      navigate(`/chat?id=${convo.id}`);
     } catch (error) {
       console.error("Matches.handleChatClick:", error);
       navigate("/chat");

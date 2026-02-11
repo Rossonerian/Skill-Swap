@@ -32,7 +32,7 @@ export default function Auth() {
         const { error } = await signUp(email, password, name);
         if (error) throw error;
         toast({ title: "Account created!", description: "Let's set up your profile." });
-        navigate("/profile/setup");
+        navigate("/profile");
       }
     } catch (error: any) {
       toast({
