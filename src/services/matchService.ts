@@ -47,7 +47,7 @@ export function normalizeSkillName(name: string): string {
     "photography": ["photography", "photo"],
   };
   
-  let normalized = name
+  const normalized = name
     .toLowerCase()
     .trim()
     .replace(/[.,!?;:\-_&]/g, " ") // Remove punctuation
