@@ -206,5 +206,72 @@ def main(argv=None):
     return 0
 
 
+def interactive_menu():
+    """Simple menu-driven UI for local DB operations."""
+    def prompt(msg: str, required: bool = True) -> str:
+        while True:
+            try:
+                v = input(msg).strip()
+            except (EOFError, KeyboardInterrupt):
+                print()
+                return ""
+            if v or not required:
+                return v
+
+    while True:
+        print("\nLocal DB Tool — interactive menu")
+        print("1) Init local_db.json")
+        print("2) Show full DB")
+        print("3) List collection (users/profiles/matches/conversations/messages)")
+        print("4) Add user")
+        print("5) Upsert profile")
+        print("6) Ensure conversation for match")
+        print("7) Add message")
+        print("8) Exit")
+        choice = prompt("Select an option: ")
+        if choice == "1":
+            force = prompt("Force overwrite if exists? (y/N): ", required=False).lower() == "y"
+            cmd_init(argparse.Namespace(force=force))
+        elif choice == "2":
+            cmd_show(argparse.Namespace())
+        elif choice == "3":
+            col = prompt("Collection name: ")
+            cmd_list(argparse.Namespace(collection=col))
+        elif choice == "4":
+            email = prompt("Email: ")
+            password = prompt("Password: ")
+            name = prompt("Name (optional): ", required=False)
+            cmd_add_user(argparse.Namespace(email=email, password=password, name=name))
+        elif choice == "5":
+            user_id = prompt("User ID: ")
+            name = prompt("Name (optional): ", required=False)
+            college = prompt("College (optional): ", required=False)
+            branch = prompt("Branch (optional): ", required=False)
+            year = prompt("Year (optional): ", required=False)
+            bio = prompt("Bio (optional): ", required=False)
+            cmd_upsert_profile(argparse.Namespace(user_id=user_id, name=name, college=college, branch=branch, year=year, bio=bio))
+        elif choice == "6":
+            match_id = prompt("Match ID: ")
+            cmd_ensure_convo(argparse.Namespace(match_id=match_id))
+        elif choice == "7":
+            convo_id = prompt("Conversation ID: ")
+            sender_id = prompt("Sender ID: ")
+            content = prompt("Content: ")
+            cmd_add_message(argparse.Namespace(conversation_id=convo_id, sender_id=sender_id, content=content))
+        elif choice == "8" or choice.lower() in ("q", "quit", "exit"):
+            print("Exiting.")
+            break
+        else:
+            print("Unknown option")
+
+
 if __name__ == "__main__":
-    raise SystemExit(main())
+    # If no args provided, run interactive menu; otherwise use CLI parser
+    if len(sys.argv) <= 1:
+        try:
+            interactive_menu()
+        except KeyboardInterrupt:
+            print("\nInterrupted. Exiting.")
+            sys.exit(0)
+    else:
+        raise SystemExit(main())
