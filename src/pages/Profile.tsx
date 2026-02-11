@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, KeyboardEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, Loader, Mail, MapPin } from "lucide-react";
@@ -6,8 +6,14 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { databases } from "@/integrations/appwrite/client";
-import { DB_ID, PROFILES_COLLECTION } from "@/services/appwriteService";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
+import { getProfileByUserId, upsertProfile } from "@/services/localDb";
 
 interface ProfileData {
   user_id: string;
@@ -25,6 +31,12 @@ export default function Profile() {
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+
+  // Skill preferences
+  const [teachSkills, setTeachSkills] = useState<string[]>([]);
+  const [learnSkills, setLearnSkills] = useState<string[]>([]);
+  const [newTeachSkill, setNewTeachSkill] = useState("");
+  const [newLearnSkill, setNewLearnSkill] = useState("");
 
   const [formData, setFormData] = useState({
     name: "",
@@ -46,12 +58,7 @@ export default function Profile() {
     if (!user?.id) return;
     setLoading(true);
     try {
-      const response = await databases.listDocuments(
-        DB_ID,
-        PROFILES_COLLECTION
-      );
-
-      const profile = response.documents.find((doc: any) => doc.user_id === user.id);
+      const profile = getProfileByUserId(user.id);
 
       if (profile) {
         setProfile({
@@ -69,6 +76,10 @@ export default function Profile() {
           year: profile.year || "",
           bio: profile.bio || "",
         });
+
+        // Load skill preferences if present
+        setTeachSkills(Array.isArray(profile.skills_teach) ? profile.skills_teach : []);
+        setLearnSkills(Array.isArray(profile.skills_learn) ? profile.skills_learn : []);
       }
     } catch (error) {
       console.error("Profile.loadProfile:", error);
@@ -83,46 +94,23 @@ export default function Profile() {
 
     try {
       // Get existing profile
-      const response = await databases.listDocuments(
-        DB_ID,
-        PROFILES_COLLECTION
-      );
+      const basePayload = {
+        name: formData.name,
+        college: formData.college,
+        branch: formData.branch,
+        year: formData.year,
+        bio: formData.bio,
+        skills_teach: teachSkills,
+        skills_learn: learnSkills,
+        is_profile_complete:
+          !!formData.name &&
+          !!formData.college &&
+          !!formData.branch &&
+          !!formData.year,
+      };
 
-      const existingProfile = response.documents.find((doc: any) => doc.user_id === user.id);
-
-      if (existingProfile) {
-        // Update existing profile
-        await databases.updateDocument(
-          DB_ID,
-          PROFILES_COLLECTION,
-          existingProfile.$id,
-          {
-            name: formData.name,
-            college: formData.college,
-            branch: formData.branch,
-            year: formData.year,
-            bio: formData.bio,
-            updated_at: new Date().toISOString(),
-          }
-        );
-      } else {
-        // Create new profile
-        await databases.createDocument(
-          DB_ID,
-          PROFILES_COLLECTION,
-          "unique()",
-          {
-            user_id: user.id,
-            name: formData.name,
-            college: formData.college,
-            branch: formData.branch,
-            year: formData.year,
-            bio: formData.bio,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          }
-        );
-      }
+      // Local JSON-based upsert
+      upsertProfile(user.id, basePayload as any);
 
       await loadProfile();
     } catch (error) {
@@ -130,6 +118,43 @@ export default function Profile() {
     } finally {
       setSaving(false);
     }
+  };
+
+  const addTeachSkill = () => {
+    const value = newTeachSkill.trim();
+    if (!value) return;
+    if (!teachSkills.includes(value)) {
+      setTeachSkills([...teachSkills, value]);
+    }
+    setNewTeachSkill("");
+  };
+
+  const addLearnSkill = () => {
+    const value = newLearnSkill.trim();
+    if (!value) return;
+    if (!learnSkills.includes(value)) {
+      setLearnSkills([...learnSkills, value]);
+    }
+    setNewLearnSkill("");
+  };
+
+  const handleSkillKeyDown = (e: KeyboardEvent<HTMLInputElement>, type: "teach" | "learn") => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      if (type === "teach") {
+        addTeachSkill();
+      } else {
+        addLearnSkill();
+      }
+    }
+  };
+
+  const removeTeachSkill = (skill: string) => {
+    setTeachSkills(teachSkills.filter((s) => s !== skill));
+  };
+
+  const removeLearnSkill = (skill: string) => {
+    setLearnSkills(learnSkills.filter((s) => s !== skill));
   };
 
   if (authLoading || loading) {
@@ -239,14 +264,23 @@ export default function Profile() {
                     <label className="text-xs font-semibold uppercase text-muted-foreground mb-2 block">
                       Year
                     </label>
-                    <Input
+                    <Select
                       value={formData.year}
-                      onChange={(e) =>
-                        setFormData({ ...formData, year: e.target.value })
+                      onValueChange={(value) =>
+                        setFormData({ ...formData, year: value })
                       }
-                      placeholder="1st, 2nd, 3rd, 4th"
-                      className="bg-white/40 border-white/60"
-                    />
+                    >
+                      <SelectTrigger className="bg-white/40 border-white/60">
+                        <SelectValue placeholder="Select year" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="1st year">1st year</SelectItem>
+                        <SelectItem value="2nd year">2nd year</SelectItem>
+                        <SelectItem value="3rd year">3rd year</SelectItem>
+                        <SelectItem value="4th year">4th year</SelectItem>
+                        <SelectItem value="Pass-out">Pass-out</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
 
@@ -264,6 +298,84 @@ export default function Profile() {
                     className="w-full px-4 py-2.5 rounded-xl bg-white/40 border border-white/60 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary/50"
                     rows={4}
                   />
+                </div>
+
+                {/* Skills to Teach */}
+                <div>
+                  <label className="text-xs font-semibold uppercase text-muted-foreground mb-2 block">
+                    Skills you can teach
+                  </label>
+                  <div className="flex gap-2 mb-2">
+                    <Input
+                      value={newTeachSkill}
+                      onChange={(e) => setNewTeachSkill(e.target.value)}
+                      onKeyDown={(e) => handleSkillKeyDown(e, "teach")}
+                      placeholder="e.g., React, UI design"
+                      className="bg-white/40 border-white/60"
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={addTeachSkill}
+                      disabled={!newTeachSkill.trim()}
+                    >
+                      Add
+                    </Button>
+                  </div>
+                  {teachSkills.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                      {teachSkills.map((skill) => (
+                        <button
+                          type="button"
+                          key={skill}
+                          onClick={() => removeTeachSkill(skill)}
+                          className="px-3 py-1 rounded-full text-xs bg-primary/10 text-primary border border-primary/30 hover:bg-primary/20 transition-colors"
+                          title="Click to remove"
+                        >
+                          {skill}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Skills to Learn */}
+                <div>
+                  <label className="text-xs font-semibold uppercase text-muted-foreground mb-2 block">
+                    Skills you want to learn
+                  </label>
+                  <div className="flex gap-2 mb-2">
+                    <Input
+                      value={newLearnSkill}
+                      onChange={(e) => setNewLearnSkill(e.target.value)}
+                      onKeyDown={(e) => handleSkillKeyDown(e, "learn")}
+                      placeholder="e.g., TypeScript, Public speaking"
+                      className="bg-white/40 border-white/60"
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={addLearnSkill}
+                      disabled={!newLearnSkill.trim()}
+                    >
+                      Add
+                    </Button>
+                  </div>
+                  {learnSkills.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                      {learnSkills.map((skill) => (
+                        <button
+                          type="button"
+                          key={skill}
+                          onClick={() => removeLearnSkill(skill)}
+                          className="px-3 py-1 rounded-full text-xs bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 transition-colors"
+                          title="Click to remove"
+                        >
+                          {skill}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 {/* Email (read-only) */}

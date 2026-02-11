@@ -1,11 +1,13 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { account } from "@/integrations/appwrite/client";
+import {
+  getCurrentUserFromSession,
+  localSignIn,
+  localSignOut,
+  localSignUp,
+  LocalUser,
+} from "@/services/localDb";
 
-interface User {
-  $id: string;
-  email: string;
-  name?: string;
-}
+type User = Pick<LocalUser, "id" | "email" | "name">;
 
 interface Session {
   user: User;
@@ -31,9 +33,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Check for existing session
     const checkSession = async () => {
       try {
-        const currentUser = await account.get();
-        setUser(currentUser as User);
-        setSession({ user: currentUser as User });
+        const currentUser = getCurrentUserFromSession();
+        if (currentUser) {
+          const normalizedUser: User = {
+            id: currentUser.id,
+            email: currentUser.email,
+            name: currentUser.name,
+          };
+          setUser(normalizedUser);
+          setSession({ user: normalizedUser });
+        } else {
+          setUser(null);
+          setSession(null);
+        }
       } catch (error) {
         // No active session
         setUser(null);
@@ -48,15 +60,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signUp = async (email: string, password: string, name: string) => {
     try {
-      // Create user account
-      const newUser = await account.create("unique()", email, password, name);
-      
-      // Auto sign in after signup
-      await account.createEmailPasswordSession(email, password);
-      
-      setUser(newUser as User);
-      setSession({ user: newUser as User });
-      
+      const { user: createdUser, error } = await localSignUp(email, password, name);
+      if (error || !createdUser) {
+        return { error };
+      }
+
+      const normalizedUser: User = {
+        id: createdUser.id,
+        email: createdUser.email,
+        name: createdUser.name,
+      };
+
+      setUser(normalizedUser);
+      setSession({ user: normalizedUser });
+
       return { error: null };
     } catch (error) {
       return { error: error as Error };
@@ -65,12 +82,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signIn = async (email: string, password: string) => {
     try {
-      await account.createEmailPasswordSession(email, password);
-      const currentUser = await account.get();
-      
-      setUser(currentUser as User);
-      setSession({ user: currentUser as User });
-      
+      const { user: signedInUser, error } = await localSignIn(email, password);
+      if (error || !signedInUser) {
+        return { error };
+      }
+
+      const normalizedUser: User = {
+        id: signedInUser.id,
+        email: signedInUser.email,
+        name: signedInUser.name,
+      };
+
+      setUser(normalizedUser);
+      setSession({ user: normalizedUser });
+
       return { error: null };
     } catch (error) {
       return { error: error as Error };
@@ -79,7 +104,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signOut = async () => {
     try {
-      await account.deleteSession("current");
+      await localSignOut();
       setUser(null);
       setSession(null);
     } catch (error) {

@@ -32,27 +32,16 @@ export default function Dashboard() {
     );
   }
 
-  // Get the best available name for greeting
-  const getDisplayName = (): string => {
-    // Try to get full name from metadata first
-    const fullName = user?.user_metadata?.full_name || user?.user_metadata?.name;
-    if (fullName && fullName.trim()) {
-      return fullName.split(" ")[0]; // Just first name
-    }
-
-    // Fallback to email prefix (cleaned)
-    const emailPrefix = user?.email?.split("@")[0] || "";
-    if (emailPrefix) {
-      return emailPrefix
-        .split(/[._-]/) // Split on common delimiters
-        .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
-        .join(" ");
-    }
-
-    return "there";
-  };
-
-  const userName = getDisplayName();
+  // Get the best available name for greeting from our local auth shape
+  const userName =
+    (user?.name && user.name.split(" ")[0]) ||
+    (user?.email
+      ? user.email
+          .split("@")[0]
+          .split(/[._-]/)
+          .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+          .join(" ")
+      : "there");
 
   return (
     <div className="min-h-screen gradient-bg">
