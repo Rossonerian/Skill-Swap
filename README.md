@@ -151,6 +151,29 @@ npm run preview
 
 The build output is written to the `dist/` folder.
 
+### Local DB tool
+
+For quick local testing and to manipulate the app's local JSON database from the terminal, use the bundled helper script:
+
+```bash
+# initialize an empty local_db.json (optional)
+./scripts/local_db_tool.py init
+
+# add a user
+./scripts/local_db_tool.py add-user --email you@example.com --password secret --name "Your Name"
+
+# upsert a profile for an existing user
+./scripts/local_db_tool.py upsert-profile --user-id user_xxx --name "Your Name" --college "My University"
+
+# add a message to a conversation
+./scripts/local_db_tool.py add-message --conversation-id convo_xxx --sender-id user_xxx --content "hello"
+
+# show the full DB
+./scripts/local_db_tool.py show
+```
+
+The script reads/writes `local_db.json` at the repository root. It's intended for local development only and mirrors the shape used by the app's `src/services/localDb.ts`.
+
 ---
 
 ## Data storage & resetting
