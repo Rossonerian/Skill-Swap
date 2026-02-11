@@ -8,49 +8,36 @@ The current version is completely **backend‑less** in terms of external servic
 
 ## Features
 
-### Core user flows
-
 - **Authentication (local JSON)**
   - Email + password sign up and sign in.
-  - Session is remembered in `localStorage` on the same browser.
 
 - **Profile management**
-  - Personal info: name, college, branch, year, bio.
   - **Year selector**: dropdown with `1st year`, `2nd year`, `3rd year`, `4th year`, and `Pass-out` (only one value at a time).
   - Read‑only email field sourced from authentication.
   - Profile completeness flag (`is_profile_complete`) persisted.
-
 - **Skills (teach / learn)**
   - Separate lists for:
     - **Skills you can teach** (e.g. React, UI design).
     - **Skills you want to learn** (e.g. TypeScript, public speaking).
   - Add skills via input + “Add” button or Enter key.
-  - Remove a skill by clicking its chip.
   - Skills are stored on the profile as:
-    - `skills_teach: string[]`
-    - `skills_learn: string[]`
+## Deployment (local-first)
 
-- **Matching algorithm**
-  - Matches users based on:
-    - Complementary skills (what you teach vs what they want, and vice versa).
-    - Shared college, year, and branch.
-  - Produces:
-    - **Score** from 0–100.
-    - **Match type**: `perfect`, `strong`, `good`, `potential`.
-    - Human‑readable **reasons** (e.g. “Mutual: Both teach and learn React”).
-    - Lists of mutual and one‑way skill matches.
-  - Matches are stored locally and reused by browse/matches/chat.
+This project is intended to run completely locally as a single-page Vite app.
 
-- **Browse & search profiles**
-  - Browse all other profiles in a responsive grid.
-  - Search by **name** or **college**.
-  - Filter by:
-    - Minimum match score (slider).
-    - “Only exact matches” toggle (mutual skill matches only).
-  - **Works even if you have no matches yet** – you can still search and view other profiles as long as they exist.
+- **Build command**: `npm run build`
+- **Output directory**: `dist`
 
-- **Matches**
-  - List of users with whom you have generated matches.
+SPA routing is supported when serving `dist` from a static host. For local
+development, use the preview command:
+
+```bash
+npm run build
+npm run preview
+```
+
+Note: Vercel/Render-specific configs have been removed to keep the repo
+focused on local development.
   - Shows:
     - Match score and type.
     - Key reasons for the match.
@@ -183,30 +170,35 @@ To reset manually in the browser:
 
 ---
 
-## Deployment
+## Git & GitHub (keep simple)
 
-The app is a standard Vite SPA and can be deployed as a static site.
+This repo is configured for a simple `main`-first workflow. Recommended
+practices to keep GitHub interactions minimal and predictable:
 
-- **Build command**: `npm run build`
-- **Output directory**: `dist`
+- Work locally on feature branches, but merge to `main` for releases.
+- Use SSH keys for authentication to avoid credential popups.
+- Keep CI minimal or disable it if you only want local builds (no `.github/workflows` present).
 
-### Vercel
+Common commands:
 
-- `vercel.json` is included and configured to:
-  - Run `npm run build`.
-  - Serve from `dist`.
-- `VERCEL_DEPLOYMENT.md` contains a detailed step‑by‑step guide.
+```bash
+# Install deps
+npm ci
 
-### Render
+# Start dev server
+npm run dev
 
-- `render.yaml` is included for a static site:
-  - `buildCommand: npm run build`
-  - `staticPublishPath: dist`
+# Build for production
+npm run build
 
-### SPA routing
+# Push local main to GitHub (SSH remote expected)
+git checkout main
+git pull origin main
+git push origin main
+```
 
-- `public/_redirects` is configured to route all paths to `index.html`:
-  - `/* /index.html 200`
+If you want me to simplify history (squash or rewrite) or remove remote branches,
+I can do that — but it is destructive. Ask before a force-push.
 
 ---
 
