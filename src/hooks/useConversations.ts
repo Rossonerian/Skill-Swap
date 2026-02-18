@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { fetchConversationsForUser } from "@/services/appwriteService";
+import { DEMO_MODE } from "@/demo";
+import { demoService } from "@/demo/demoService";
+
 
 export interface ConversationWithDetails {
   id: string;
@@ -27,17 +30,25 @@ export function useConversations() {
   const [loading, setLoading] = useState(true);
 
   const fetchConversations = async () => {
-    if (!user) return;
-    setLoading(true);
-    try {
-      const conversationsWithDetails = await fetchConversationsForUser(user.id);
+  if (!user) return;
+  setLoading(true);
+
+  try {
+    if (DEMO_MODE) {
+      const data = await demoService.fetchConversations("demo-user-id");
+      setConversations(data as any);
+    } else {
+      const conversationsWithDetails =
+        await fetchConversationsForUser(user.id);
       setConversations(conversationsWithDetails as ConversationWithDetails[]);
-    } catch (error) {
-      console.error("Error fetching conversations:", error);
-    } finally {
-      setLoading(false);
     }
-  };
+  } catch (error) {
+    console.error("Error fetching conversations:", error);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   useEffect(() => {
     fetchConversations();

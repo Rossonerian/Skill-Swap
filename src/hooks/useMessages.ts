@@ -8,6 +8,9 @@ import {
   createMessagesChannel,
   removeChannel,
 } from "@/services/appwriteService";
+import { DEMO_MODE } from "@/demo";
+import { demoService } from "@/demo/demoService";
+
 
 export function useMessages(conversationId: string | null) {
   const { user } = useAuth();
@@ -15,35 +18,55 @@ export function useMessages(conversationId: string | null) {
   const [loading, setLoading] = useState(true);
 
   const fetchMessages = useCallback(async () => {
-    if (!conversationId) {
-      setMessages([]);
-      setLoading(false);
-      return;
-    }
-    try {
-      const data = await fetchMessagesForConversation(conversationId);
+  if (!conversationId) {
+    setMessages([]);
+    setLoading(false);
+    return;
+  }
+
+  try {
+    if (DEMO_MODE) {
+      const data = await demoService.fetchMessages(conversationId);
+      setMessages(data as Message[]);
+    } else {
+      const data =
+        await fetchMessagesForConversation(conversationId);
       setMessages(data as Message[]);
 
       if (user) {
         await markMessagesRead(conversationId, user.id);
       }
-    } catch (error) {
-      console.error("Error fetching messages:", error);
-    } finally {
-      setLoading(false);
     }
-  }, [conversationId, user]);
+  } catch (error) {
+    console.error("Error fetching messages:", error);
+  } finally {
+    setLoading(false);
+  }
+}, [conversationId, user]);
+
 
   const sendMessage = async (content: string) => {
-    if (!conversationId || !user || !content.trim()) return false;
+  if (!conversationId || !user || !content.trim()) return false;
 
-    try {
-      return await sendMessageToConversation(conversationId, user.id, content);
-    } catch (error) {
-      console.error("Error sending message:", error);
-      return false;
+  try {
+    if (DEMO_MODE) {
+  setTimeout(() => {
+    fetchMessages();
+  }, 3200);
+}
+
     }
-  };
+
+    return await sendMessageToConversation(
+      conversationId,
+      user.id,
+      content
+    );
+  } catch (error) {
+    console.error("Error sending message:", error);
+    return false;
+  }
+};
 
   // Subscribe to realtime updates
   useEffect(() => {
