@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { Search, Star } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { Input } from "@/components/ui/input";
 import { ConversationList } from "@/components/chat/ConversationList";
@@ -7,33 +8,32 @@ import { ChatWindow } from "@/components/chat/ChatWindow";
 import { ChatEmptyState } from "@/components/chat/ChatEmptyState";
 import { SkeletonCard } from "@/components/SkeletonCard";
 import { useAuth } from "@/contexts/AuthContext";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 export default function Chat() {
   const { user } = useAuth();
-
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [showMobileChat, setShowMobileChat] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
 
-  const [selectedConversation, setSelectedConversation] = useState<any>(null);
-  const [messages, setMessages] = useState<any[]>([]);
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [rating, setRating] = useState(0);
+  const [feedbackText, setFeedbackText] = useState("");
+  const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
 
   useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 800);
+    const timer = setTimeout(() => setLoading(false), 1000);
     return () => clearTimeout(timer);
   }, []);
 
   const currentUserId = user?.id;
 
-  // 🚀 Reset conversations & messages when user changes
-  useEffect(() => {
-    if (!currentUserId) return;
-
-    const convo =
-      currentUserId === "alex-id"
-        ? {
+  const conversations =
+    currentUserId === "alex-id"
+      ? [
+          {
             id: "c1",
             other_user: {
               id: "maya-id",
@@ -42,8 +42,10 @@ export default function Chat() {
               avatar_url: null,
             },
             unread_count: 1,
-          }
-        : {
+          },
+        ]
+      : [
+          {
             id: "c2",
             other_user: {
               id: "alex-id",
@@ -52,45 +54,35 @@ export default function Chat() {
               avatar_url: null,
             },
             unread_count: 0,
-          };
+          },
+        ];
 
-    setSelectedConversation(convo);
+  const [selectedConversation, setSelectedConversation] =
+    useState(conversations[0]);
 
-    const initial =
-      currentUserId === "alex-id"
-        ? [
-            {
-              id: "m1",
-              sender_id: "maya-id",
-              content: "Hey Alex! Ready to learn React?",
-              created_at: new Date().toISOString(),
-            },
-          ]
-        : [
-            {
-              id: "m2",
-              sender_id: "alex-id",
-              content: "Hi Maya! Excited to start Python!",
-              created_at: new Date().toISOString(),
-            },
-          ];
+  const initialMessages =
+    currentUserId === "alex-id"
+      ? [
+          {
+            id: "m1",
+            sender_id: "maya-id",
+            content: "Hey Alex! Ready to learn React?",
+            created_at: new Date().toISOString(),
+          },
+        ]
+      : [
+          {
+            id: "m2",
+            sender_id: "alex-id",
+            content: "Hi Maya! Excited to start Python!",
+            created_at: new Date().toISOString(),
+          },
+        ];
 
-    setMessages(initial);
-  }, [currentUserId]);
-
-  if (!currentUserId) {
-    return (
-      <div className="min-h-screen gradient-bg">
-        <Navbar />
-        <ChatEmptyState type="no-conversations" />
-      </div>
-    );
-  }
-
-  const conversations = selectedConversation ? [selectedConversation] : [];
+  const [messages, setMessages] = useState(initialMessages);
 
   const handleSendMessage = async (content: string) => {
-    if (!content.trim() || !selectedConversation) return false;
+    if (!content.trim()) return false;
 
     const newMessage = {
       id: crypto.randomUUID(),
@@ -124,7 +116,7 @@ export default function Chat() {
     if (lower.includes("react"))
       return "Perfect! Let’s start with components and hooks tomorrow.";
     if (lower.includes("python"))
-      return "Awesome! I’ll begin with syntax and loops first.";
+      return "Awesome! I’ll begin with basic syntax and loops.";
     if (lower.includes("when"))
       return "How about this weekend?";
     if (lower.includes("time"))
@@ -132,6 +124,18 @@ export default function Chat() {
 
     return "That sounds great! Looking forward to our skill swap 🚀";
   }
+
+  const handleSubmitFeedback = () => {
+    if (!rating) return;
+    setFeedbackSubmitted(true);
+
+    setTimeout(() => {
+      setShowFeedbackModal(false);
+      setRating(0);
+      setFeedbackText("");
+      setFeedbackSubmitted(false);
+    }, 2000);
+  };
 
   const filteredConversations = conversations.filter((c) =>
     c.other_user.name
@@ -148,7 +152,7 @@ export default function Chat() {
     );
   }
 
-  if (!filteredConversations.length) {
+  if (!conversations.length) {
     return (
       <div className="min-h-screen gradient-bg">
         <Navbar />
@@ -190,15 +194,27 @@ export default function Chat() {
                   conversations={filteredConversations}
                   selectedId={selectedConversation?.id}
                   onSelect={setSelectedConversation}
-                  currentUserId={currentUserId}
+                  currentUserId={currentUserId!}
                 />
               </div>
 
               <div className="flex-1 flex flex-col">
+                {/* FEEDBACK BUTTON */}
+                <div className="p-4 border-b flex justify-end">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowFeedbackModal(true)}
+                  >
+                    <Star className="w-4 h-4 mr-2" />
+                    Leave Feedback
+                  </Button>
+                </div>
+
                 <ChatWindow
                   conversation={selectedConversation}
                   messages={messages}
-                  currentUserId={currentUserId}
+                  currentUserId={currentUserId!}
                   typingUsers={isTyping ? ["typing"] : []}
                   onSendMessage={handleSendMessage}
                   onTyping={() => {}}
@@ -210,6 +226,64 @@ export default function Chat() {
           </div>
         </div>
       </main>
+
+      {/* FEEDBACK MODAL */}
+      {showFeedbackModal && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="bg-white rounded-2xl p-8 w-[90%] max-w-md shadow-xl"
+          >
+            {feedbackSubmitted ? (
+              <div className="text-center">
+                <h2 className="text-xl font-bold mb-2">
+                  Thank you for your feedback!
+                </h2>
+                <p className="text-muted-foreground">
+                  Your experience helps improve SkillSwap 🚀
+                </p>
+              </div>
+            ) : (
+              <>
+                <h2 className="text-xl font-bold mb-4">
+                  Rate your experience
+                </h2>
+
+                <div className="flex gap-2 mb-4 justify-center">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <Star
+                      key={star}
+                      onClick={() => setRating(star)}
+                      className={`w-7 h-7 cursor-pointer ${
+                        star <= rating
+                          ? "fill-yellow-400 text-yellow-400"
+                          : "text-gray-300"
+                      }`}
+                    />
+                  ))}
+                </div>
+
+                <textarea
+                  placeholder="Write your feedback..."
+                  value={feedbackText}
+                  onChange={(e) => setFeedbackText(e.target.value)}
+                  className="w-full border rounded-xl p-3 text-sm mb-4"
+                  rows={3}
+                />
+
+                <Button
+                  className="w-full"
+                  disabled={!rating}
+                  onClick={handleSubmitFeedback}
+                >
+                  Submit Feedback
+                </Button>
+              </>
+            )}
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 }
