@@ -1,13 +1,10 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import {
-  getCurrentUserFromSession,
-  localSignIn,
-  localSignOut,
-  localSignUp,
-  LocalUser,
-} from "@/services/localDb";
 
-type User = Pick<LocalUser, "id" | "email" | "name">;
+type User = {
+  id: string;
+  email: string;
+  name: string;
+};
 
 interface Session {
   user: User;
@@ -17,103 +14,88 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
-  signUp: (email: string, password: string, name: string) => Promise<{ error: Error | null }>;
-  signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
+  signUp: (
+    email: string,
+    password: string,
+    name: string
+  ) => Promise<{ error: Error | null }>;
+  signIn: (
+    email: string,
+    password: string
+  ) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+// 🔥 Demo Accounts
+const DEMO_USERS: Record<string, User> = {
+  "alex@demo.com": {
+    id: "alex-id",
+    email: "alex@demo.com",
+    name: "Alex Johnson",
+  },
+  "maya@demo.com": {
+    id: "maya-id",
+    email: "maya@demo.com",
+    name: "Maya Sharma",
+  },
+};
+
+const DEMO_PASSWORD = "123456";
+
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // Restore session
   useEffect(() => {
-    // Check for existing session
-    const checkSession = async () => {
-      try {
-        const currentUser = getCurrentUserFromSession();
-        if (currentUser) {
-          const normalizedUser: User = {
-            id: currentUser.id,
-            email: currentUser.email,
-            name: currentUser.name,
-          };
-          setUser(normalizedUser);
-          setSession({ user: normalizedUser });
-        } else {
-          setUser(null);
-          setSession(null);
-        }
-      } catch (error) {
-        // No active session
-        setUser(null);
-        setSession(null);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    checkSession();
+    const stored = localStorage.getItem("demo-session");
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      setUser(parsed.user);
+      setSession(parsed);
+    }
+    setLoading(false);
   }, []);
 
-  const signUp = async (email: string, password: string, name: string) => {
-    try {
-      const { user: createdUser, error } = await localSignUp(email, password, name);
-      if (error || !createdUser) {
-        return { error };
-      }
-
-      const normalizedUser: User = {
-        id: createdUser.id,
-        email: createdUser.email,
-        name: createdUser.name,
-      };
-
-      setUser(normalizedUser);
-      setSession({ user: normalizedUser });
-
-      return { error: null };
-    } catch (error) {
-      return { error: error as Error };
-    }
+  const signUp = async () => {
+    return {
+      error: new Error("Sign up disabled in demo mode."),
+    };
   };
 
   const signIn = async (email: string, password: string) => {
-    try {
-      const { user: signedInUser, error } = await localSignIn(email, password);
-      if (error || !signedInUser) {
-        return { error };
-      }
+    await new Promise((r) => setTimeout(r, 1200)); // fake server delay
 
-      const normalizedUser: User = {
-        id: signedInUser.id,
-        email: signedInUser.email,
-        name: signedInUser.name,
-      };
+    const demoUser = DEMO_USERS[email.toLowerCase()];
 
-      setUser(normalizedUser);
-      setSession({ user: normalizedUser });
-
-      return { error: null };
-    } catch (error) {
-      return { error: error as Error };
+    if (!demoUser || password !== DEMO_PASSWORD) {
+      return { error: new Error("Invalid demo credentials") };
     }
+
+    const newSession = { user: demoUser };
+
+    localStorage.setItem("demo-session", JSON.stringify(newSession));
+    setUser(demoUser);
+    setSession(newSession);
+
+    return { error: null };
   };
 
   const signOut = async () => {
-    try {
-      await localSignOut();
-      setUser(null);
-      setSession(null);
-    } catch (error) {
-      console.error("Error signing out:", error);
-    }
+    localStorage.removeItem("demo-session");
+    setUser(null);
+    setSession(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, signUp, signIn, signOut }}>
+    <AuthContext.Provider
+      value={{ user, session, loading, signUp, signIn, signOut }}
+    >
       {children}
     </AuthContext.Provider>
   );
@@ -121,8 +103,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider");
+  if (!context) {
+    throw new Error("useAuth must be used within AuthProvider");
   }
   return context;
 };
