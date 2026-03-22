@@ -3,9 +3,6 @@ import cors from "cors";
 import jwt from "jsonwebtoken";
 import { supabase } from "./supabase.js";
 import { authRequired } from "./middleware.js";
-import dotenv from "dotenv";
-
-dotenv.config({ path: "../.env.local" });
 
 const app = express();
 const port = Number(process.env.PORT || 8888);
