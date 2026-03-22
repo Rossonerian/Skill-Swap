@@ -1,0 +1,2579 @@
+This file is a merged representation of the entire codebase, combined into a single document by Repomix.
+The content has been processed where empty lines have been removed, content has been compressed (code blocks are separated by ⋮---- delimiter), security check has been disabled.
+
+<file_summary>
+This section contains a summary of this file.
+
+<purpose>
+This file contains a packed representation of the entire repository's contents.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+</purpose>
+
+<file_format>
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files (if enabled)
+5. Multiple file entries, each consisting of:
+  - File path as an attribute
+  - Full contents of the file
+</file_format>
+
+<usage_guidelines>
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+</usage_guidelines>
+
+<notes>
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Empty lines have been removed from all files
+- Content has been compressed - code blocks are separated by ⋮---- delimiter
+- Security check has been disabled - content may contain sensitive information
+- Files are sorted by Git change count (files with more changes are at the bottom)
+</notes>
+
+</file_summary>
+
+<directory_structure>
+public/
+  _redirects
+  favicon.ico
+  placeholder.svg
+  robots.txt
+scripts/
+  local_db_tool.py
+src/
+  components/
+    chat/
+      ChatEmptyState.tsx
+      ChatWindow.tsx
+      ConversationList.tsx
+    ui/
+      accordion.tsx
+      alert-dialog.tsx
+      alert.tsx
+      aspect-ratio.tsx
+      avatar.tsx
+      badge.tsx
+      breadcrumb.tsx
+      button.tsx
+      calendar.tsx
+      card.tsx
+      carousel.tsx
+      chart.tsx
+      checkbox.tsx
+      collapsible.tsx
+      command.tsx
+      context-menu.tsx
+      dialog.tsx
+      drawer.tsx
+      dropdown-menu.tsx
+      form.tsx
+      hover-card.tsx
+      input-otp.tsx
+      input.tsx
+      label.tsx
+      menubar.tsx
+      navigation-menu.tsx
+      pagination.tsx
+      popover.tsx
+      progress.tsx
+      radio-group.tsx
+      resizable.tsx
+      scroll-area.tsx
+      select.tsx
+      separator.tsx
+      sheet.tsx
+      sidebar.tsx
+      skeleton.tsx
+      slider.tsx
+      sonner.tsx
+      switch.tsx
+      table.tsx
+      tabs.tsx
+      textarea.tsx
+      toast.tsx
+      toaster.tsx
+      toggle-group.tsx
+      toggle.tsx
+      tooltip.tsx
+      use-toast.ts
+    EmptyState.tsx
+    MatchBadge.tsx
+    Navbar.tsx
+    NavLink.tsx
+    SkeletonCard.tsx
+    SkillTag.tsx
+    UserCard.tsx
+  contexts/
+    AuthContext.tsx
+  demo/
+    demoData.ts
+    demoService.ts
+    index.ts
+  dev/
+    localDbSync.ts
+  hooks/
+    use-mobile.tsx
+    use-toast.ts
+    useConversations.ts
+    useMessages.ts
+    useTypingIndicator.ts
+  lib/
+    utils.ts
+  pages/
+    Auth.tsx
+    Browse.tsx
+    Chat.tsx
+    Dashboard.tsx
+    Index.tsx
+    Matches.tsx
+    NotFound.tsx
+    Profile.tsx
+  services/
+    appwriteService.ts
+    localDb.ts
+    matchService.ts
+  types/
+    index.ts
+  App.css
+  App.tsx
+  index.css
+  main.tsx
+  vite-env.d.ts
+.gitattributes
+.gitignore
+.vercelignore
+dev.sh
+eslint.config.js
+eval "$(ssh-agent -s)"
+eval "$(ssh-agent -s)".pub
+index.html
+local_db.json
+local_db.json.broken.20260218090122
+package.json
+postcss.config.js
+README.md
+tailwind.config.ts
+tsconfig.app.json
+tsconfig.json
+tsconfig.node.json
+vite.config.ts
+</directory_structure>
+
+<files>
+This section contains the contents of the repository's files.
+
+<file path="public/_redirects">
+/* /index.html 200
+</file>
+
+<file path="public/placeholder.svg">
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1200" fill="none"><rect width="1200" height="1200" fill="#EAEAEA" rx="3"/><g opacity=".5"><g opacity=".5"><path fill="#FAFAFA" d="M600.709 736.5c-75.454 0-136.621-61.167-136.621-136.62 0-75.454 61.167-136.621 136.621-136.621 75.453 0 136.62 61.167 136.62 136.621 0 75.453-61.167 136.62-136.62 136.62Z"/><path stroke="#C9C9C9" stroke-width="2.418" d="M600.709 736.5c-75.454 0-136.621-61.167-136.621-136.62 0-75.454 61.167-136.621 136.621-136.621 75.453 0 136.62 61.167 136.62 136.621 0 75.453-61.167 136.62-136.62 136.62Z"/></g><path stroke="url(#a)" stroke-width="2.418" d="M0-1.209h553.581" transform="scale(1 -1) rotate(45 1163.11 91.165)"/><path stroke="url(#b)" stroke-width="2.418" d="M404.846 598.671h391.726"/><path stroke="url(#c)" stroke-width="2.418" d="M599.5 795.742V404.017"/><path stroke="url(#d)" stroke-width="2.418" d="m795.717 796.597-391.441-391.44"/><path fill="#fff" d="M600.709 656.704c-31.384 0-56.825-25.441-56.825-56.824 0-31.384 25.441-56.825 56.825-56.825 31.383 0 56.824 25.441 56.824 56.825 0 31.383-25.441 56.824-56.824 56.824Z"/><g clip-path="url(#e)"><path fill="#666" fill-rule="evenodd" d="M616.426 586.58h-31.434v16.176l3.553-3.554.531-.531h9.068l.074-.074 8.463-8.463h2.565l7.18 7.181V586.58Zm-15.715 14.654 3.698 3.699 1.283 1.282-2.565 2.565-1.282-1.283-5.2-5.199h-6.066l-5.514 5.514-.073.073v2.876a2.418 2.418 0 0 0 2.418 2.418h26.598a2.418 2.418 0 0 0 2.418-2.418v-8.317l-8.463-8.463-7.181 7.181-.071.072Zm-19.347 5.442v4.085a6.045 6.045 0 0 0 6.046 6.045h26.598a6.044 6.044 0 0 0 6.045-6.045v-7.108l1.356-1.355-1.282-1.283-.074-.073v-17.989h-38.689v23.43l-.146.146.146.147Z" clip-rule="evenodd"/></g><path stroke="#C9C9C9" stroke-width="2.418" d="M600.709 656.704c-31.384 0-56.825-25.441-56.825-56.824 0-31.384 25.441-56.825 56.825-56.825 31.383 0 56.824 25.441 56.824 56.825 0 31.383-25.441 56.824-56.824 56.824Z"/></g><defs><linearGradient id="a" x1="554.061" x2="-.48" y1=".083" y2=".087" gradientUnits="userSpaceOnUse"><stop stop-color="#C9C9C9" stop-opacity="0"/><stop offset=".208" stop-color="#C9C9C9"/><stop offset=".792" stop-color="#C9C9C9"/><stop offset="1" stop-color="#C9C9C9" stop-opacity="0"/></linearGradient><linearGradient id="b" x1="796.912" x2="404.507" y1="599.963" y2="599.965" gradientUnits="userSpaceOnUse"><stop stop-color="#C9C9C9" stop-opacity="0"/><stop offset=".208" stop-color="#C9C9C9"/><stop offset=".792" stop-color="#C9C9C9"/><stop offset="1" stop-color="#C9C9C9" stop-opacity="0"/></linearGradient><linearGradient id="c" x1="600.792" x2="600.794" y1="403.677" y2="796.082" gradientUnits="userSpaceOnUse"><stop stop-color="#C9C9C9" stop-opacity="0"/><stop offset=".208" stop-color="#C9C9C9"/><stop offset=".792" stop-color="#C9C9C9"/><stop offset="1" stop-color="#C9C9C9" stop-opacity="0"/></linearGradient><linearGradient id="d" x1="404.85" x2="796.972" y1="403.903" y2="796.02" gradientUnits="userSpaceOnUse"><stop stop-color="#C9C9C9" stop-opacity="0"/><stop offset=".208" stop-color="#C9C9C9"/><stop offset=".792" stop-color="#C9C9C9"/><stop offset="1" stop-color="#C9C9C9" stop-opacity="0"/></linearGradient><clipPath id="e"><path fill="#fff" d="M581.364 580.535h38.689v38.689h-38.689z"/></clipPath></defs></svg>
+</file>
+
+<file path="public/robots.txt">
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Twitterbot
+Allow: /
+
+User-agent: facebookexternalhit
+Allow: /
+
+User-agent: *
+Allow: /
+</file>
+
+<file path="scripts/local_db_tool.py">
+#!/usr/bin/env python3
+"""Simple local DB tool: show, list, get/add/update basic operations.
+This minimal script intentionally avoids interactive menus and advanced
+features; it is aimed at quick inspection and light updates of
+`local_db.json` during development.
+"""
+⋮----
+ROOT = Path(__file__).resolve().parents[1]
+DB_FILE = ROOT / "local_db.json"
+def now_iso() -> str
+def generate_id(prefix: str) -> str
+def load_db(path: Path = DB_FILE) -> Dict[str, Any]
+def save_db(db: Dict[str, Any], path: Path = DB_FILE) -> None
+⋮----
+tmp = path.with_suffix(path.suffix + ".tmp")
+⋮----
+def cmd_show(args: argparse.Namespace) -> None
+⋮----
+db = load_db()
+⋮----
+def cmd_list(args: argparse.Namespace) -> None
+⋮----
+key = args.collection
+⋮----
+def cmd_get_user(args: argparse.Namespace) -> None
+⋮----
+email = args.email.lower()
+user = next((u for u in db["users"] if u.get("email", "").lower() == email), None)
+⋮----
+user = next((u for u in db["users"] if u.get("id") == args.user_id), None)
+⋮----
+def cmd_get_profile(args: argparse.Namespace) -> None
+⋮----
+profile = next((p for p in db["profiles"] if p.get("user_id") == args.user_id), None)
+⋮----
+profile = next((p for p in db["profiles"] if p.get("id") == args.profile_id), None)
+⋮----
+def cmd_add_user(args: argparse.Namespace) -> None
+⋮----
+user = {"id": generate_id("user"), "email": email, "name": args.name or "", "password": args.password}
+⋮----
+def cmd_upsert_profile(args: argparse.Namespace) -> None
+⋮----
+user_id = args.user_id
+now = now_iso()
+existing = next((p for p in db["profiles"] if p.get("user_id") == user_id), None)
+partial = {k: v for k, v in [("name", args.name), ("college", args.college), ("branch", args.branch), ("year", args.year), ("bio", args.bio)] if v is not None}
+⋮----
+profile = {"id": generate_id("profile"), "user_id": user_id, "name": partial.get("name", ""), "college": partial.get("college", ""), "branch": partial.get("branch", ""), "year": partial.get("year", ""), "bio": partial.get("bio", ""), "avatar_url": None, "is_profile_complete": False, "created_at": now, "updated_at": now}
+⋮----
+def cmd_add_message(args: argparse.Namespace) -> None
+⋮----
+msg = {"id": generate_id("msg"), "conversation_id": args.conversation_id, "sender_id": args.sender_id, "content": args.content, "is_read": False, "created_at": now_iso()}
+⋮----
+def cmd_set_db(args: argparse.Namespace) -> None
+⋮----
+# replace DB from a file or stdin
+⋮----
+p = Path(args.file)
+⋮----
+data = json.load(f)
+⋮----
+data = json.load(sys.stdin)
+# basic shape check
+⋮----
+def cmd_seed(args: argparse.Namespace) -> None
+⋮----
+"""Seed the DB with random dummy data for development testing."""
+⋮----
+num_users = int(args.users or 5)
+sample_names = [
+colleges = ["MIT", "Stanford", "UCLA", "Oxford", "Cambridge", "State U"]
+branches = ["Computer Science", "Mathematics", "Physics", "Engineering", "Art", None]
+skills = ["Guitar", "French", "Cooking", "Photography", "Data Science", "Public Speaking"]
+created_users = []
+⋮----
+name = random.choice(sample_names) + (" " + random.choice(["Smith", "Chen", "Patel", "Garcia"]) if random.random() < 0.6 else "")
+email = f"{name.split()[0].lower()}{random.randint(1,999)}@example.com"
+user = {"id": generate_id("user"), "email": email, "name": name, "password": "secret"}
+⋮----
+prof = {
+⋮----
+# create some matches between users
+possible_pairs = []
+⋮----
+match_types = ["perfect", "strong", "good", "potential"]
+created_matches = []
+⋮----
+score = random.randint(30, 100)
+mtype = random.choice(match_types)
+match = {
+⋮----
+# create a conversation for accepted matches
+⋮----
+convo = {"id": generate_id("convo"), "match_id": match["id"], "created_at": now_iso()}
+⋮----
+# add a couple messages
+⋮----
+sender = random.choice([a, b])
+msg = {
+⋮----
+def build_parser() -> argparse.ArgumentParser
+⋮----
+p = argparse.ArgumentParser(description="Simple local DB viewer/updater")
+sub = p.add_subparsers(dest="cmd")
+sub_show = sub.add_parser("show"); sub_show.set_defaults(func=cmd_show)
+sub_list = sub.add_parser("list"); sub_list.add_argument("collection", choices=["users", "profiles", "matches", "conversations", "messages"]); sub_list.set_defaults(func=cmd_list)
+sub_get_user = sub.add_parser("get-user"); sub_get_user.add_argument("--email"); sub_get_user.add_argument("--user-id"); sub_get_user.set_defaults(func=cmd_get_user)
+sub_get_profile = sub.add_parser("get-profile"); sub_get_profile.add_argument("--user-id"); sub_get_profile.add_argument("--profile-id"); sub_get_profile.set_defaults(func=cmd_get_profile)
+sub_add_user = sub.add_parser("add-user"); sub_add_user.add_argument("--email", required=True); sub_add_user.add_argument("--password", required=True); sub_add_user.add_argument("--name"); sub_add_user.set_defaults(func=cmd_add_user)
+sub_upsert = sub.add_parser("upsert-profile"); sub_upsert.add_argument("--user-id", required=True); sub_upsert.add_argument("--name"); sub_upsert.add_argument("--college"); sub_upsert.add_argument("--branch"); sub_upsert.add_argument("--year"); sub_upsert.add_argument("--bio"); sub_upsert.set_defaults(func=cmd_upsert_profile)
+sub_msg = sub.add_parser("add-message"); sub_msg.add_argument("--conversation-id", required=True); sub_msg.add_argument("--sender-id", required=True); sub_msg.add_argument("--content", required=True); sub_msg.set_defaults(func=cmd_add_message)
+sub_set = sub.add_parser("set-db"); sub_set.add_argument("--file", help="JSON file to replace DB with (defaults to stdin)"); sub_set.set_defaults(func=cmd_set_db)
+sub_seed = sub.add_parser("seed"); sub_seed.add_argument("--users", help="Number of random users to create (default 5)"); sub_seed.set_defaults(func=cmd_seed)
+⋮----
+def main(argv=None)
+⋮----
+p = build_parser()
+args = p.parse_args(argv)
+⋮----
+def interactive_menu()
+⋮----
+def prompt(msg: str, required: bool = True) -> str
+⋮----
+v = input(msg).strip()
+⋮----
+choice = prompt("Select an option: ")
+⋮----
+col = prompt("Collection (users/profiles/matches/conversations/messages): ")
+⋮----
+email = prompt("Email (leave empty to use user-id): ", required=False)
+⋮----
+uid = prompt("User ID: ")
+⋮----
+uid = prompt("User ID (leave empty to use profile-id): ", required=False)
+⋮----
+pid = prompt("Profile ID: ")
+⋮----
+email = prompt("Email: ")
+password = prompt("Password: ")
+name = prompt("Name (optional): ", required=False)
+⋮----
+college = prompt("College (optional): ", required=False)
+branch = prompt("Branch (optional): ", required=False)
+year = prompt("Year (optional): ", required=False)
+bio = prompt("Bio (optional): ", required=False)
+⋮----
+convo = prompt("Conversation ID: ")
+sender = prompt("Sender ID: ")
+content = prompt("Content: ")
+⋮----
+path = prompt("File path (leave empty to read from stdin): ", required=False)
+⋮----
+# If no args provided, launch interactive menu
+</file>
+
+<file path="src/components/chat/ChatEmptyState.tsx">
+import { motion } from "framer-motion";
+import { MessageCircle, Users, Sparkles } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
+interface ChatEmptyStateProps {
+  type: "no-conversations" | "select-conversation";
+}
+</file>
+
+<file path="src/components/chat/ChatWindow.tsx">
+import { useState, useRef, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { formatDistanceToNow, format, isToday, isYesterday } from "date-fns";
+import { Send, ArrowLeft } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Message } from "@/types";
+import { ConversationWithDetails } from "@/hooks/useConversations";
+import { cn } from "@/lib/utils";
+interface ChatWindowProps {
+  conversation: ConversationWithDetails;
+  messages: Message[];
+  currentUserId: string;
+  typingUsers: string[];
+  onSendMessage: (content: string) => Promise<boolean>;
+  onTyping: () => void;
+  onBack?: () => void;
+  loading?: boolean;
+}
+⋮----
+const scrollToBottom = () =>
+⋮----
+const handleSubmit = async (e: React.FormEvent) =>
+const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+const formatMessageTime = (dateStr: string) =>
+⋮----
+// Group messages by date
+⋮----
+const formatDateHeader = (dateStr: string) =>
+⋮----
+{/* Header */}
+⋮----
+{/* Messages */}
+⋮----
+className=
+⋮----
+{/* Typing indicator */}
+⋮----
+{/* Input */}
+</file>
+
+<file path="src/components/chat/ConversationList.tsx">
+import { motion } from "framer-motion";
+import { formatDistanceToNow } from "date-fns";
+import { MessageCircle } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ConversationWithDetails } from "@/hooks/useConversations";
+import { cn } from "@/lib/utils";
+interface ConversationListProps {
+  conversations: ConversationWithDetails[];
+  selectedId: string | null;
+  onSelect: (conversation: ConversationWithDetails) => void;
+  currentUserId: string;
+}
+⋮----
+onClick=
+⋮----
+className=
+</file>
+
+<file path="src/components/ui/accordion.tsx">
+import { ChevronDown } from "lucide-react";
+import { cn } from "@/lib/utils";
+</file>
+
+<file path="src/components/ui/alert-dialog.tsx">
+import { cn } from "@/lib/utils";
+import { buttonVariants } from "@/components/ui/button";
+⋮----
+className=
+⋮----
+<div className=
+</file>
+
+<file path="src/components/ui/alert.tsx">
+import { cva, type VariantProps } from "class-variance-authority";
+import { cn } from "@/lib/utils";
+⋮----
+<div ref=
+</file>
+
+<file path="src/components/ui/aspect-ratio.tsx">
+
+</file>
+
+<file path="src/components/ui/avatar.tsx">
+import { cn } from "@/lib/utils";
+</file>
+
+<file path="src/components/ui/badge.tsx">
+import { cva, type VariantProps } from "class-variance-authority";
+import { cn } from "@/lib/utils";
+⋮----
+export interface BadgeProps extends React.HTMLAttributes<HTMLDivElement>, VariantProps<typeof badgeVariants> {}
+function Badge(
+⋮----
+return <div className=
+</file>
+
+<file path="src/components/ui/breadcrumb.tsx">
+import { Slot } from "@radix-ui/react-slot";
+import { ChevronRight, MoreHorizontal } from "lucide-react";
+import { cn } from "@/lib/utils";
+⋮----
+className=
+⋮----
+const BreadcrumbSeparator = ({ children, className, ...props }: React.ComponentProps<"li">) => (
+  <li role="presentation" aria-hidden="true" className={cn("[&>svg]:size-3.5", className)} {...props}>
+    {children ?? <ChevronRight />}
+  </li>
+);
+⋮----
+<li role="presentation" aria-hidden="true" className=
+⋮----
+const BreadcrumbEllipsis = ({ className, ...props }: React.ComponentProps<"span">) => (
+  <span
+    role="presentation"
+    aria-hidden="true"
+    className={cn("flex h-9 w-9 items-center justify-center", className)}
+    {...props}
+  >
+    <MoreHorizontal className="h-4 w-4" />
+    <span className="sr-only">More</span>
+  </span>
+);
+</file>
+
+<file path="src/components/ui/button.tsx">
+import { Slot } from "@radix-ui/react-slot";
+import { cva, type VariantProps } from "class-variance-authority";
+import { cn } from "@/lib/utils";
+⋮----
+export interface ButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+    VariantProps<typeof buttonVariants> {
+  asChild?: boolean;
+}
+⋮----
+return <Comp className=
+</file>
+
+<file path="src/components/ui/calendar.tsx">
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { DayPicker } from "react-day-picker";
+import { cn } from "@/lib/utils";
+import { buttonVariants } from "@/components/ui/button";
+export type CalendarProps = React.ComponentProps<typeof DayPicker>;
+</file>
+
+<file path="src/components/ui/card.tsx">
+import { cn } from "@/lib/utils";
+</file>
+
+<file path="src/components/ui/carousel.tsx">
+import useEmblaCarousel, { type UseEmblaCarouselType } from "embla-carousel-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+type CarouselApi = UseEmblaCarouselType[1];
+type UseCarouselParameters = Parameters<typeof useEmblaCarousel>;
+type CarouselOptions = UseCarouselParameters[0];
+type CarouselPlugin = UseCarouselParameters[1];
+type CarouselProps = {
+  opts?: CarouselOptions;
+  plugins?: CarouselPlugin;
+  orientation?: "horizontal" | "vertical";
+  setApi?: (api: CarouselApi) => void;
+};
+type CarouselContextProps = {
+  carouselRef: ReturnType<typeof useEmblaCarousel>[0];
+  api: ReturnType<typeof useEmblaCarousel>[1];
+  scrollPrev: () => void;
+  scrollNext: () => void;
+  canScrollPrev: boolean;
+  canScrollNext: boolean;
+} & CarouselProps;
+⋮----
+function useCarousel()
+⋮----
+className=
+</file>
+
+<file path="src/components/ui/chart.tsx">
+import { cn } from "@/lib/utils";
+// Format: { THEME_NAME: CSS_SELECTOR }
+⋮----
+export type ChartConfig = {
+  [k in string]: {
+    label?: React.ReactNode;
+    icon?: React.ComponentType;
+  } & ({ color?: string; theme?: never } | { color?: never; theme: Record<keyof typeof THEMES, string> });
+};
+type ChartContextProps = {
+  config: ChartConfig;
+};
+⋮----
+function useChart()
+⋮----
+className=
+⋮----
+return <div className=
+⋮----
+// Helper to extract item config from a payload.
+</file>
+
+<file path="src/components/ui/checkbox.tsx">
+import { Check } from "lucide-react";
+import { cn } from "@/lib/utils";
+</file>
+
+<file path="src/components/ui/collapsible.tsx">
+
+</file>
+
+<file path="src/components/ui/command.tsx">
+import { type DialogProps } from "@radix-ui/react-dialog";
+import { Command as CommandPrimitive } from "cmdk";
+import { Search } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+⋮----
+const CommandDialog = (
+⋮----
+return <span className=
+</file>
+
+<file path="src/components/ui/context-menu.tsx">
+import { Check, ChevronRight, Circle } from "lucide-react";
+import { cn } from "@/lib/utils";
+⋮----
+return <span className=
+</file>
+
+<file path="src/components/ui/dialog.tsx">
+import { X } from "lucide-react";
+import { cn } from "@/lib/utils";
+⋮----
+<div className=
+</file>
+
+<file path="src/components/ui/drawer.tsx">
+import { Drawer as DrawerPrimitive } from "vaul";
+import { cn } from "@/lib/utils";
+const Drawer = ({ shouldScaleBackground = true, ...props }: React.ComponentProps<typeof DrawerPrimitive.Root>) => (
+  <DrawerPrimitive.Root shouldScaleBackground={shouldScaleBackground} {...props} />
+);
+⋮----
+const DrawerHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div className={cn("grid gap-1.5 p-4 text-center sm:text-left", className)} {...props} />
+);
+⋮----
+<div className=
+⋮----
+const DrawerFooter = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div className={cn("mt-auto flex flex-col gap-2 p-4", className)} {...props} />
+);
+</file>
+
+<file path="src/components/ui/dropdown-menu.tsx">
+import { Check, ChevronRight, Circle } from "lucide-react";
+import { cn } from "@/lib/utils";
+⋮----
+className=
+⋮----
+return <span className=
+</file>
+
+<file path="src/components/ui/form.tsx">
+import { Slot } from "@radix-ui/react-slot";
+import { Controller, ControllerProps, FieldPath, FieldValues, FormProvider, useFormContext } from "react-hook-form";
+import { cn } from "@/lib/utils";
+import { Label } from "@/components/ui/label";
+⋮----
+type FormFieldContextValue<
+  TFieldValues extends FieldValues = FieldValues,
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
+> = {
+  name: TName;
+};
+⋮----
+const FormField = <
+  TFieldValues extends FieldValues = FieldValues,
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
+>({
+  ...props
+}: ControllerProps<TFieldValues, TName>) =>
+const useFormField = () =>
+type FormItemContextValue = {
+  id: string;
+};
+⋮----
+return <p ref=
+⋮----
+<p ref=
+</file>
+
+<file path="src/components/ui/hover-card.tsx">
+import { cn } from "@/lib/utils";
+</file>
+
+<file path="src/components/ui/input-otp.tsx">
+import { OTPInput, OTPInputContext } from "input-otp";
+import { Dot } from "lucide-react";
+import { cn } from "@/lib/utils";
+⋮----
+className=
+</file>
+
+<file path="src/components/ui/input.tsx">
+import { cn } from "@/lib/utils";
+</file>
+
+<file path="src/components/ui/label.tsx">
+import { cva, type VariantProps } from "class-variance-authority";
+import { cn } from "@/lib/utils";
+</file>
+
+<file path="src/components/ui/menubar.tsx">
+import { Check, ChevronRight, Circle } from "lucide-react";
+import { cn } from "@/lib/utils";
+⋮----
+className=
+⋮----
+return <span className=
+</file>
+
+<file path="src/components/ui/navigation-menu.tsx">
+import { cva } from "class-variance-authority";
+import { ChevronDown } from "lucide-react";
+import { cn } from "@/lib/utils";
+⋮----
+<div className=
+⋮----
+className=
+</file>
+
+<file path="src/components/ui/pagination.tsx">
+import { ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { ButtonProps, buttonVariants } from "@/components/ui/button";
+const Pagination = ({ className, ...props }: React.ComponentProps<"nav">) => (
+  <nav
+    role="navigation"
+    aria-label="pagination"
+    className={cn("mx-auto flex w-full justify-center", className)}
+    {...props}
+  />
+);
+⋮----
+type PaginationLinkProps = {
+  isActive?: boolean;
+} & Pick<ButtonProps, "size"> &
+  React.ComponentProps<"a">;
+const PaginationLink = ({ className, isActive, size = "icon", ...props }: PaginationLinkProps) => (
+  <a
+    aria-current={isActive ? "page" : undefined}
+    className={cn(
+      buttonVariants({
+        variant: isActive ? "outline" : "ghost",
+        size,
+      }),
+      className,
+    )}
+    {...props}
+  />
+);
+⋮----
+className=
+⋮----
+const PaginationPrevious = ({ className, ...props }: React.ComponentProps<typeof PaginationLink>) => (
+  <PaginationLink aria-label="Go to previous page" size="default" className={cn("gap-1 pl-2.5", className)} {...props}>
+    <ChevronLeft className="h-4 w-4" />
+    <span>Previous</span>
+  </PaginationLink>
+);
+⋮----
+const PaginationNext = ({ className, ...props }: React.ComponentProps<typeof PaginationLink>) => (
+  <PaginationLink aria-label="Go to next page" size="default" className={cn("gap-1 pr-2.5", className)} {...props}>
+    <span>Next</span>
+    <ChevronRight className="h-4 w-4" />
+  </PaginationLink>
+);
+⋮----
+const PaginationEllipsis = ({ className, ...props }: React.ComponentProps<"span">) => (
+  <span aria-hidden className={cn("flex h-9 w-9 items-center justify-center", className)} {...props}>
+    <MoreHorizontal className="h-4 w-4" />
+    <span className="sr-only">More pages</span>
+  </span>
+);
+⋮----
+<span aria-hidden className=
+</file>
+
+<file path="src/components/ui/popover.tsx">
+import { cn } from "@/lib/utils";
+</file>
+
+<file path="src/components/ui/progress.tsx">
+import { cn } from "@/lib/utils";
+</file>
+
+<file path="src/components/ui/radio-group.tsx">
+import { Circle } from "lucide-react";
+import { cn } from "@/lib/utils";
+⋮----
+return <RadioGroupPrimitive.Root className=
+</file>
+
+<file path="src/components/ui/resizable.tsx">
+import { GripVertical } from "lucide-react";
+⋮----
+import { cn } from "@/lib/utils";
+const ResizablePanelGroup = ({ className, ...props }: React.ComponentProps<typeof ResizablePrimitive.PanelGroup>) => (
+  <ResizablePrimitive.PanelGroup
+    className={cn("flex h-full w-full data-[panel-group-direction=vertical]:flex-col", className)}
+    {...props}
+  />
+);
+⋮----
+className=
+</file>
+
+<file path="src/components/ui/scroll-area.tsx">
+import { cn } from "@/lib/utils";
+⋮----
+className=
+</file>
+
+<file path="src/components/ui/select.tsx">
+import { Check, ChevronDown, ChevronUp } from "lucide-react";
+import { cn } from "@/lib/utils";
+</file>
+
+<file path="src/components/ui/separator.tsx">
+import { cn } from "@/lib/utils";
+</file>
+
+<file path="src/components/ui/sheet.tsx">
+import { cva, type VariantProps } from "class-variance-authority";
+import { X } from "lucide-react";
+⋮----
+import { cn } from "@/lib/utils";
+⋮----
+className=
+⋮----
+<div className=
+</file>
+
+<file path="src/components/ui/sidebar.tsx">
+import { Slot } from "@radix-ui/react-slot";
+import { VariantProps, cva } from "class-variance-authority";
+import { PanelLeft } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Separator } from "@/components/ui/separator";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+⋮----
+type SidebarContext = {
+  state: "expanded" | "collapsed";
+  open: boolean;
+  setOpen: (open: boolean) => void;
+  openMobile: boolean;
+  setOpenMobile: (open: boolean) => void;
+  isMobile: boolean;
+  toggleSidebar: () => void;
+};
+⋮----
+function useSidebar()
+⋮----
+// This is the internal state of the sidebar.
+// We use openProp and setOpenProp for control from outside the component.
+⋮----
+// This sets the cookie to keep the sidebar state.
+⋮----
+// Helper to toggle the sidebar.
+⋮----
+// Adds a keyboard shortcut to toggle the sidebar.
+⋮----
+const handleKeyDown = (event: KeyboardEvent) =>
+⋮----
+// We add a state so that we can do data-state="expanded" or "collapsed".
+// This makes it easier to style the sidebar with Tailwind classes.
+⋮----
+className=
+⋮----
+{/* This is what handles the sidebar gap on desktop */}
+⋮----
+// Adjust the padding for floating and inset variants.
+⋮----
+onClick?.(event);
+toggleSidebar();
+⋮----
+return <div ref=
+⋮----
+// Increases the hit area of the button on mobile.
+⋮----
+<ul ref=
+⋮----
+// Increases the hit area of the button on mobile.
+⋮----
+// Random width between 50 to 90%.
+</file>
+
+<file path="src/components/ui/skeleton.tsx">
+import { cn } from "@/lib/utils";
+function Skeleton(
+⋮----
+return <div className=
+</file>
+
+<file path="src/components/ui/slider.tsx">
+import { cn } from "@/lib/utils";
+</file>
+
+<file path="src/components/ui/sonner.tsx">
+import { useTheme } from "next-themes";
+import { Toaster as Sonner, toast } from "sonner";
+type ToasterProps = React.ComponentProps<typeof Sonner>;
+</file>
+
+<file path="src/components/ui/switch.tsx">
+import { cn } from "@/lib/utils";
+⋮----
+className=
+</file>
+
+<file path="src/components/ui/table.tsx">
+import { cn } from "@/lib/utils";
+</file>
+
+<file path="src/components/ui/tabs.tsx">
+import { cn } from "@/lib/utils";
+</file>
+
+<file path="src/components/ui/textarea.tsx">
+import { cn } from "@/lib/utils";
+export interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {}
+⋮----
+className=
+</file>
+
+<file path="src/components/ui/toast.tsx">
+import { cva, type VariantProps } from "class-variance-authority";
+import { X } from "lucide-react";
+import { cn } from "@/lib/utils";
+</file>
+
+<file path="src/components/ui/toaster.tsx">
+import { useToast } from "@/hooks/use-toast";
+import { Toast, ToastClose, ToastDescription, ToastProvider, ToastTitle, ToastViewport } from "@/components/ui/toast";
+export function Toaster()
+</file>
+
+<file path="src/components/ui/toggle-group.tsx">
+import { type VariantProps } from "class-variance-authority";
+import { cn } from "@/lib/utils";
+import { toggleVariants } from "@/components/ui/toggle";
+</file>
+
+<file path="src/components/ui/toggle.tsx">
+import { cva, type VariantProps } from "class-variance-authority";
+import { cn } from "@/lib/utils";
+</file>
+
+<file path="src/components/ui/tooltip.tsx">
+import { cn } from "@/lib/utils";
+⋮----
+className=
+</file>
+
+<file path="src/components/ui/use-toast.ts">
+import { useToast, toast } from "@/hooks/use-toast";
+</file>
+
+<file path="src/components/EmptyState.tsx">
+import { motion } from "framer-motion";
+import { LucideIcon } from "lucide-react";
+import { ReactNode } from "react";
+import { Button } from "@/components/ui/button";
+interface EmptyStateProps {
+  icon: LucideIcon;
+  title: string;
+  description: string;
+  action?: {
+    label: string;
+    onClick: () => void;
+  } | ReactNode;
+}
+export function EmptyState(
+</file>
+
+<file path="src/components/MatchBadge.tsx">
+import { motion } from "framer-motion";
+import { MatchType } from "@/types";
+import { cn } from "@/lib/utils";
+interface MatchBadgeProps {
+  score: number;
+  type: MatchType;
+  showScore?: boolean;
+  size?: "sm" | "default" | "lg";
+}
+function getMatchLabel(type: MatchType):
+function getMatchColorClass(type: MatchType): string
+export function MatchBadge(
+</file>
+
+<file path="src/components/Navbar.tsx">
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import { 
+  Home, 
+  Search, 
+  MessageCircle, 
+  User, 
+  LogOut, 
+  Sparkles,
+  Menu,
+  X
+} from "lucide-react";
+import { useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { cn } from "@/lib/utils";
+⋮----
+const handleSignOut = async () =>
+⋮----
+{/* Desktop Navbar */}
+⋮----
+<DropdownMenuItem onClick=
+⋮----
+{/* Mobile Top Bar */}
+⋮----
+{/* Mobile Menu Overlay */}
+⋮----
+{/* Mobile Slide Menu */}
+⋮----
+onClick=
+⋮----
+{/* Mobile Bottom Nav */}
+</file>
+
+<file path="src/components/NavLink.tsx">
+import { NavLink as RouterNavLink, NavLinkProps } from "react-router-dom";
+import { forwardRef } from "react";
+import { cn } from "@/lib/utils";
+interface NavLinkCompatProps extends Omit<NavLinkProps, "className"> {
+  className?: string;
+  activeClassName?: string;
+  pendingClassName?: string;
+}
+⋮----
+cn(className, isActive && activeClassName, isPending && pendingClassName)
+</file>
+
+<file path="src/components/SkeletonCard.tsx">
+import { motion } from "framer-motion";
+export function SkeletonCard()
+</file>
+
+<file path="src/components/SkillTag.tsx">
+import { motion } from "framer-motion";
+import { X } from "lucide-react";
+import { cn } from "@/lib/utils";
+interface SkillTagProps {
+  name: string;
+  variant?: "offered" | "wanted";
+  onRemove?: () => void;
+  onClick?: () => void;
+  size?: "sm" | "default";
+}
+export function SkillTag({ 
+  name, 
+  variant = "offered", 
+  onRemove, 
+  onClick,
+  size = "default" 
+}: SkillTagProps)
+⋮----
+e.stopPropagation();
+onRemove();
+</file>
+
+<file path="src/components/UserCard.tsx">
+import { motion } from "framer-motion";
+import { User, BookOpen, GraduationCap, MapPin } from "lucide-react";
+import { UserWithSkills } from "@/types";
+import { SkillTag } from "./SkillTag";
+import { MatchBadge } from "./MatchBadge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+interface UserCardProps {
+  user: UserWithSkills;
+  onConnect?: () => void;
+  onViewProfile?: () => void;
+}
+export function UserCard(
+⋮----
+{/* Skills Offered */}
+⋮----
+{/* Skills Wanted */}
+</file>
+
+<file path="src/contexts/AuthContext.tsx">
+import React, { createContext, useContext, useEffect, useState } from "react";
+type User = {
+  id: string;
+  email: string;
+  name: string;
+};
+interface Session {
+  user: User;
+}
+interface AuthContextType {
+  user: User | null;
+  session: Session | null;
+  loading: boolean;
+  signUp: (
+    email: string,
+    password: string,
+    name: string
+  ) => Promise<{ error: Error | null }>;
+  signIn: (
+    email: string,
+    password: string
+  ) => Promise<{ error: Error | null }>;
+  signOut: () => Promise<void>;
+}
+⋮----
+// 🔥 Demo Accounts
+⋮----
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) =>
+⋮----
+// Restore session
+⋮----
+const signUp = async () =>
+const signIn = async (email: string, password: string) =>
+⋮----
+await new Promise((r) => setTimeout(r, 1200)); // fake server delay
+⋮----
+const signOut = async () =>
+⋮----
+export const useAuth = () =>
+</file>
+
+<file path="src/demo/demoData.ts">
+export interface DemoUser {
+  id: string;
+  name: string;
+  college: string;
+  avatar_url: string;
+}
+export interface DemoConversation {
+  id: string;
+  match_id: string;
+  user1_id: string;
+  user2_id: string;
+  created_at: string;
+}
+export interface DemoMessage {
+  id: string;
+  conversation_id: string;
+  sender_id: string;
+  content: string;
+  created_at: string;
+  is_read: boolean;
+}
+</file>
+
+<file path="src/demo/demoService.ts">
+import { demoConversations, demoMessages, demoUsers } from "./demoData";
+const delay = (ms: number)
+⋮----
+async fetchConversations(userId: string)
+async fetchMessages(conversationId: string)
+async sendMessage(
+    conversationId: string,
+    userId: string,
+    content: string
+)
+</file>
+
+<file path="src/demo/index.ts">
+
+</file>
+
+<file path="src/dev/localDbSync.ts">
+// Dev helper: sync server `local_db.json` <-> browser `localStorage` during `npm run dev`.
+// - Loads initial DB from the dev server endpoint `/__local_db`.
+// - Listens to server Server-Sent-Events `/__local_db/events` for live updates.
+// - Patches `localStorage.setItem` to POST updates back to the server when the app writes the DB key.
+⋮----
+async function fetchAndSet()
+⋮----
+// ignore in dev helper
+// console.error("localDbSync.fetchAndSet", e);
+⋮----
+function startSSE()
+⋮----
+// EventSource will auto-retry — nothing to do here.
+⋮----
+// ignore
+⋮----
+function patchSetItem()
+⋮----
+function schedulePush()
+async function pushDbToServer()
+⋮----
+// ignore
+</file>
+
+<file path="src/hooks/use-mobile.tsx">
+export function useIsMobile()
+⋮----
+const onChange = () =>
+</file>
+
+<file path="src/hooks/use-toast.ts">
+import type { ToastActionElement, ToastProps } from "@/components/ui/toast";
+⋮----
+type ToasterToast = ToastProps & {
+  id: string;
+  title?: React.ReactNode;
+  description?: React.ReactNode;
+  action?: ToastActionElement;
+};
+⋮----
+function genId()
+type ActionType = typeof actionTypes;
+type Action =
+  | {
+      type: ActionType["ADD_TOAST"];
+      toast: ToasterToast;
+    }
+  | {
+      type: ActionType["UPDATE_TOAST"];
+      toast: Partial<ToasterToast>;
+    }
+  | {
+      type: ActionType["DISMISS_TOAST"];
+      toastId?: ToasterToast["id"];
+    }
+  | {
+      type: ActionType["REMOVE_TOAST"];
+      toastId?: ToasterToast["id"];
+    };
+interface State {
+  toasts: ToasterToast[];
+}
+⋮----
+const addToRemoveQueue = (toastId: string) =>
+export const reducer = (state: State, action: Action): State =>
+⋮----
+// ! Side effects ! - This could be extracted into a dismissToast() action,
+// but I'll keep it here for simplicity
+⋮----
+function dispatch(action: Action)
+type Toast = Omit<ToasterToast, "id">;
+function toast(
+⋮----
+const update = (props: ToasterToast)
+const dismiss = () => dispatch(
+⋮----
+function useToast()
+</file>
+
+<file path="src/hooks/useConversations.ts">
+import { useState, useEffect } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { fetchConversationsForUser } from "@/services/appwriteService";
+import { DEMO_MODE } from "@/demo";
+import { demoService } from "@/demo/demoService";
+export interface ConversationWithDetails {
+  id: string;
+  match_id: string;
+  created_at: string;
+  other_user: {
+    id: string;
+    name: string | null;
+    avatar_url: string | null;
+    college: string | null;
+  };
+  last_message: {
+    content: string;
+    created_at: string;
+    sender_id: string;
+    is_read: boolean;
+  } | null;
+  unread_count: number;
+}
+export function useConversations()
+⋮----
+const fetchConversations = async () =>
+</file>
+
+<file path="src/hooks/useMessages.ts">
+import { useState, useEffect, useCallback } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { Message } from "@/types";
+import {
+  fetchMessagesForConversation,
+  markMessagesRead,
+  sendMessageToConversation,
+  createMessagesChannel,
+  removeChannel,
+} from "@/services/appwriteService";
+import { DEMO_MODE } from "@/demo";
+import { demoService } from "@/demo/demoService";
+export function useMessages(conversationId: string | null)
+⋮----
+const sendMessage = async (content: string) =>
+⋮----
+// Subscribe to realtime updates
+</file>
+
+<file path="src/hooks/useTypingIndicator.ts">
+import { useState, useEffect, useRef, useCallback } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { createTypingChannel, trackTyping, removeChannel } from "@/services/appwriteService";
+export function useTypingIndicator(conversationId: string | null)
+⋮----
+// Clear existing timeout
+⋮----
+// Set timeout to stop typing indicator after 2 seconds of inactivity
+</file>
+
+<file path="src/lib/utils.ts">
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
+export function cn(...inputs: ClassValue[])
+</file>
+
+<file path="src/pages/Auth.tsx">
+import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import { Mail, Lock, Sparkles, ArrowRight } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
+export default function Auth()
+⋮----
+const handleLogin = async (loginEmail: string, loginPassword: string) =>
+const handleSubmit = async (e: React.FormEvent) =>
+⋮----
+{/* Manual Login Form */}
+⋮----
+onChange=
+⋮----
+{/* Divider */}
+⋮----
+{/* One-click Demo Buttons */}
+⋮----
+{/* Demo Info Box */}
+</file>
+
+<file path="src/pages/Browse.tsx">
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import {
+  Search,
+  Zap,
+  Users,
+  MessageCircle,
+  Loader,
+  FilterX,
+  Sparkles,
+} from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { Navbar } from "@/components/Navbar";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { SkeletonCard } from "@/components/SkeletonCard";
+import { SkillTag } from "@/components/SkillTag";
+import { MatchBadge } from "@/components/MatchBadge";
+import { EmptyState } from "@/components/EmptyState";
+import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { generateMatchesForUser, getAllUsersWithScores } from "@/services/matchService";
+import { UserWithSkills } from "@/types";
+import { cn } from "@/lib/utils";
+⋮----
+// Redirect if not authenticated
+⋮----
+// Load users on mount
+⋮----
+const loadUsers = async () =>
+⋮----
+// Check if any user has a match score (indicating matches have been generated)
+⋮----
+const handleGenerateMatches = async () =>
+⋮----
+// Reload users to show new scores
+⋮----
+// Filter users
+⋮----
+// Filter by search query (name, college)
+⋮----
+// Filter by minimum score
+⋮----
+// Filter by exact matches only (mutual skills)
+⋮----
+{/* Header */}
+⋮----
+{/* Find Matches Button */}
+⋮----
+{/* Search and Filters */}
+⋮----
+{/* Search */}
+⋮----
+{/* Filters */}
+⋮----
+onChange=
+⋮----
+{/* Users Grid */}
+⋮----
+{/* Header with score */}
+⋮----
+{/* Skills */}
+⋮----
+{/* Offers */}
+⋮----
+{/* Wants */}
+⋮----
+{/* Match Reasons */}
+⋮----
+{/* Action - only show if match exists */}
+</file>
+
+<file path="src/pages/Chat.tsx">
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { Search, Star } from "lucide-react";
+import { Navbar } from "@/components/Navbar";
+import { Input } from "@/components/ui/input";
+import { ConversationList } from "@/components/chat/ConversationList";
+import { ChatWindow } from "@/components/chat/ChatWindow";
+import { ChatEmptyState } from "@/components/chat/ChatEmptyState";
+import { SkeletonCard } from "@/components/SkeletonCard";
+import { useAuth } from "@/contexts/AuthContext";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+⋮----
+const handleSendMessage = async (content: string) =>
+function generateAIReply(message: string): string
+const handleSubmitFeedback = () =>
+⋮----
+className=
+⋮----
+{/* FEEDBACK BUTTON */}
+⋮----
+onClick=
+⋮----
+{/* FEEDBACK MODAL */}
+</file>
+
+<file path="src/pages/Dashboard.tsx">
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import { Sparkles, ArrowRight, Plus, Users } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { Navbar } from "@/components/Navbar";
+import { Button } from "@/components/ui/button";
+import { SkeletonCard } from "@/components/SkeletonCard";
+⋮----
+// Get the best available name for greeting from our local auth shape
+⋮----
+{/* Greeting */}
+⋮----
+{/* Quick Actions */}
+⋮----
+{/* Getting Started */}
+</file>
+
+<file path="src/pages/Index.tsx">
+import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
+import { Sparkles, ArrowRight, Users, Zap, MessageCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
+⋮----
+{/* Header */}
+⋮----
+{/* Hero Section */}
+⋮----
+{/* Features */}
+</file>
+
+<file path="src/pages/Matches.tsx">
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import { MessageCircle, Sparkles, Users } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { Navbar } from "@/components/Navbar";
+import { Button } from "@/components/ui/button";
+import { SkeletonCard } from "@/components/SkeletonCard";
+import { SkillTag } from "@/components/SkillTag";
+import { MatchBadge } from "@/components/MatchBadge";
+import { cn } from "@/lib/utils";
+⋮----
+// 🔥 Dynamic matches per user
+⋮----
+const handleChatClick = () =>
+</file>
+
+<file path="src/pages/NotFound.tsx">
+import { useLocation } from "react-router-dom";
+import { useEffect } from "react";
+const NotFound = () =>
+</file>
+
+<file path="src/pages/Profile.tsx">
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import { ArrowLeft, Mail, MapPin } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { Navbar } from "@/components/Navbar";
+import { Button } from "@/components/ui/button";
+export default function Profile()
+⋮----
+// 🔥 Dummy profiles based on login
+⋮----
+{/* Name */}
+⋮----
+{/* College */}
+⋮----
+{/* Branch & Year */}
+⋮----
+{/* Bio */}
+⋮----
+{/* Skills Teach */}
+⋮----
+{/* Skills Learn */}
+⋮----
+{/* Email */}
+</file>
+
+<file path="src/services/appwriteService.ts">
+import {
+  readMatches,
+  readConversations,
+  readMessages,
+  writeMessages,
+  writeConversations,
+  listProfilesByUserIds,
+  generateId,
+  ensureConversationForMatch,
+} from "@/services/localDb";
+// Dummy IDs kept for backwards compatibility with other imports
+⋮----
+export async function fetchConversationsForUser(userId: string)
+export async function fetchMessagesForConversation(conversationId: string)
+export async function markMessagesRead(conversationId: string, userId: string)
+export async function sendMessageToConversation(
+  conversationId: string,
+  userId: string,
+  content: string
+)
+export async function ensureConversationForMatchId(matchId: string)
+export function createMessagesChannel(
+  conversationId: string,
+  onInsert: (payload: any) => void
+)
+⋮----
+// Local JSON backend doesn't support realtime multi-user updates,
+// so we simply return a dummy subscription id. The caller will
+// refetch messages after sending.
+⋮----
+export function removeChannel(subscription: string)
+⋮----
+// No-op for local backend
+⋮----
+export function createTypingChannel(
+  conversationId: string,
+  userId: string,
+  onSync: (state: any) => void,
+  onSubscribed?: (status: string) => void
+)
+⋮----
+// For typing indicators, we use a custom implementation
+// Subscribe to a typing collection or use a timeout-based approach
+⋮----
+// Return a dummy subscription string since Appwrite doesn't have built-in presence
+⋮----
+export function trackTyping(
+  subscription: string,
+  payload: { user_id: string; is_typing: boolean }
+)
+⋮----
+// Appwrite realtime doesn't support direct presence tracking
+// This would be implemented via a dedicated typing collection or WebSocket custom channel
+</file>
+
+<file path="src/services/localDb.ts">
+import { Profile, MatchType } from "@/types";
+⋮----
+export interface LocalUser {
+  id: string;
+  email: string;
+  name?: string;
+  password: string;
+}
+export interface LocalMatch {
+  id: string;
+  user1_id: string;
+  user2_id: string;
+  match_score: number;
+  match_type: MatchType;
+  match_reasons: string[];
+  match_mutual_skills: string[];
+  match_one_way_for_user: string[];
+  match_one_way_from_user: string[];
+  status: "pending" | "accepted" | "rejected";
+  created_at: string;
+}
+export interface LocalConversation {
+  id: string;
+  match_id: string;
+  created_at: string;
+}
+export interface LocalMessage {
+  id: string;
+  conversation_id: string;
+  sender_id: string;
+  content: string;
+  is_read: boolean;
+  created_at: string;
+}
+interface LocalDb {
+  users: LocalUser[];
+  profiles: Profile[];
+  matches: LocalMatch[];
+  conversations: LocalConversation[];
+  messages: LocalMessage[];
+}
+function getInitialDb(): LocalDb
+function readDb(): LocalDb
+function writeDb(db: LocalDb)
+function generateId(prefix: string): string
+// -------- Auth helpers --------
+export function getCurrentUserFromSession(): LocalUser | null
+export async function localSignUp(email: string, password: string, name: string)
+⋮----
+password, // For a local prototype we keep this simple; do not use in production.
+⋮----
+export async function localSignIn(email: string, password: string)
+export async function localSignOut()
+// -------- Profile helpers --------
+export function getProfileByUserId(userId: string): Profile | null
+export function upsertProfile(userId: string, partial: Partial<Profile>): Profile
+export function listProfilesExcept(userId: string): Profile[]
+export function listProfilesByUserIds(userIds: string[]): Profile[]
+// -------- Match, conversation & message helpers (local) --------
+export function readMatches(): LocalMatch[]
+export function writeMatches(matches: LocalMatch[])
+export function readConversations(): LocalConversation[]
+export function writeConversations(conversations: LocalConversation[])
+export function readMessages(): LocalMessage[]
+export function writeMessages(messages: LocalMessage[])
+export function ensureConversationForMatch(matchId: string): LocalConversation
+</file>
+
+<file path="src/services/matchService.ts">
+import { Skill, Profile } from "@/types";
+import {
+  listProfilesExcept,
+  listProfilesByUserIds,
+  getProfileByUserId,
+  readMatches,
+  writeMatches,
+  generateId,
+} from "@/services/localDb";
+/**
+ * Normalize skill names for comparison
+ * Handles common aliases like:
+ * - UI ↔ User Interface
+ * - UX ↔ User Experience
+ * - ReactJS ↔ React
+ * - TypeScript ↔ TS
+ * - JavaScript ↔ JS
+ * Case-insensitive, trimmed, punctuation removed
+ */
+export function normalizeSkillName(name: string): string
+⋮----
+// Define skill aliases (normalized -> list of aliases)
+⋮----
+.replace(/[.,!?;:\-_&]/g, " ") // Remove punctuation
+.replace(/\s+/g, " ") // Normalize whitespace
+⋮----
+// Check if it matches any alias
+⋮----
+interface MatchDetail {
+  skill: Skill;
+  normalizedName: string;
+  direction: "teaches" | "wants";
+}
+/**
+ * Find complementary matches between two users
+ * Returns number of mutual matches and detailed breakdown
+ */
+export function findComplementaryMatches(
+  userATeaches: MatchDetail[],
+  userAWants: MatchDetail[],
+  userBTeaches: MatchDetail[],
+  userBWants: MatchDetail[]
+):
+⋮----
+// Check what A teaches that B wants
+⋮----
+// Check what B teaches that A wants
+⋮----
+// Mutual match = both directions exist
+⋮----
+interface MatchScore {
+  score: number;
+  reasons: string[];
+  mutualSkills: string[];
+  oneWaySkillsForUser: string[];
+  oneWaySkillsFromUser: string[];
+}
+/**
+ * Calculate match score between two users
+ * Scoring rules:
+ * - Mutual skill match (A teaches, B wants AND B teaches, A wants) = 30 points each
+ * - One-way match (A teaches what B wants OR B teaches what A wants) = 10 points each
+ * - Same college = 10 points
+ * - Same year = 5 points
+ * - Same branch = 5 points
+ * Max score: 100
+ */
+export function calculateMatchScore(
+  currentUserTeaches: MatchDetail[],
+  currentUserWants: MatchDetail[],
+  otherUserTeaches: MatchDetail[],
+  otherUserWants: MatchDetail[],
+  currentUser: Profile,
+  otherUser: Profile
+): MatchScore
+⋮----
+// Find complementary matches
+⋮----
+// Mutual matches (both can teach & learn from each other)
+⋮----
+// One-way matches (current user teaches what other user wants)
+⋮----
+// One-way matches (other user teaches what current user wants)
+⋮----
+// College bonus
+⋮----
+// Year bonus
+⋮----
+// Branch bonus
+⋮----
+// Cap at 100
+⋮----
+/**
+ * Generate matches for a user
+ * Compares user against all other users and creates match records
+ * with scores and reasons. Prevents duplicates via upsert logic.
+ */
+export async function generateMatchesForUser(userId: string): Promise<number>
+⋮----
+// Get current user's profile and skills from local JSON
+⋮----
+// If user has no skills, no matches possible
+⋮----
+// Get all other users from local profiles
+⋮----
+// Score each user
+⋮----
+// Calculate score
+⋮----
+// Only create match if there's at least one complementary skill
+⋮----
+// Continue with next user
+⋮----
+// Upsert matches in local JSON
+⋮----
+function getMatchType(score: number): "perfect" | "strong" | "good" | "potential"
+/**
+ * Get user's matches with scores and full details
+ */
+export async function getUserMatches(userId: string)
+⋮----
+// Enrich matches with profile data, including derived skill objects
+⋮----
+/**
+ * Get all users with their match scores (for Browse page)
+ */
+export async function getAllUsersWithScores(userId: string)
+⋮----
+// Get all users except current
+⋮----
+// Add skills and scores to each user, deriving skills from profile
+</file>
+
+<file path="src/types/index.ts">
+export interface Profile {
+  id: string;
+  user_id: string;
+  name: string | null;
+  college: string | null;
+  branch: string | null;
+  year: string | null;
+  bio: string | null;
+  avatar_url: string | null;
+  is_profile_complete: boolean;
+  created_at: string;
+  updated_at: string;
+}
+export interface Skill {
+  id: string;
+  name: string;
+  category: string | null;
+  popularity_count: number;
+  created_at: string;
+}
+export interface UserSkillOffered {
+  id: string;
+  user_id: string;
+  skill_id: string;
+  created_at: string;
+  skill?: Skill;
+}
+export interface UserSkillWanted {
+  id: string;
+  user_id: string;
+  skill_id: string;
+  created_at: string;
+  skill?: Skill;
+}
+export interface Match {
+  id: string;
+  user1_id: string;
+  user2_id: string;
+  match_score: number;
+  match_type: 'perfect' | 'strong' | 'good' | 'potential';
+  status: 'pending' | 'accepted' | 'rejected';
+  created_at: string;
+}
+export interface UserWithSkills extends Profile {
+  skills_offered: Skill[];
+  skills_wanted: Skill[];
+  match_score?: number;
+  match_type?: 'perfect' | 'strong' | 'good' | 'potential';
+  match_reasons?: string[];
+  match_mutual_skills?: string[];
+  match_one_way_for_user?: string[];
+  match_one_way_from_user?: string[];
+}
+export interface Conversation {
+  id: string;
+  match_id: string;
+  created_at: string;
+}
+export interface Message {
+  id: string;
+  conversation_id: string;
+  sender_id: string;
+  content: string;
+  is_read: boolean;
+  created_at: string;
+}
+export type MatchType = 'perfect' | 'strong' | 'good' | 'potential';
+</file>
+
+<file path="src/App.css">
+/* Legacy Vite styles removed in favor of Tailwind-based layout.
+   Intentionally left minimal so the full-screen gradient and glass UI
+   defined in index.css can take over. */
+</file>
+
+<file path="src/App.tsx">
+import { Toaster } from "@/components/ui/toaster";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "@/contexts/AuthContext";
+import Index from "./pages/Index";
+import Auth from "./pages/Auth";
+import Dashboard from "./pages/Dashboard";
+import Browse from "./pages/Browse";
+import Matches from "./pages/Matches";
+import Chat from "./pages/Chat";
+import Profile from "./pages/Profile";
+import NotFound from "./pages/NotFound";
+</file>
+
+<file path="src/index.css">
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+/* Skill Swap Design System
+   - Light theme with off-white background
+   - Pastel blue primary with lavender/mint accents
+   - Glassmorphism cards with subtle animations
+*/
+@layer base {
+⋮----
+:root {
+⋮----
+/* Core colors */
+⋮----
+/* Cards with glassmorphism */
+⋮----
+/* Primary - Pastel Blue */
+⋮----
+/* Secondary - Lavender */
+⋮----
+/* Accent - Mint */
+⋮----
+/* Muted */
+⋮----
+/* Destructive */
+⋮----
+/* Borders & inputs */
+⋮----
+/* Match score colors */
+⋮----
+/* Gradients */
+⋮----
+/* Shadows */
+⋮----
+/* Sidebar */
+⋮----
+.dark {
+⋮----
+* {
+⋮----
+@apply border-border;
+⋮----
+html {
+body {
+h1, h2, h3, h4, h5, h6 {
+⋮----
+@layer components {
+⋮----
+/* Glassmorphism card */
+.glass-card {
+/* Skill tag styles */
+.skill-tag {
+.skill-tag-offered {
+.skill-tag-wanted {
+/* Match score badges */
+.match-badge {
+.match-perfect {
+.match-strong {
+.match-good {
+/* Animated gradient background */
+.gradient-bg {
+/* Button glow effect */
+.btn-glow {
+.btn-glow:hover {
+/* Skeleton loader */
+.skeleton {
+⋮----
+@layer utilities {
+⋮----
+/* Animations */
+.animate-float {
+.animate-fade-in {
+.animate-slide-up {
+.animate-scale-in {
+⋮----
+/* Slow background gradient motion for gradient-bg */
+⋮----
+/* Stagger animations for children */
+.stagger-children > * {
+.stagger-children > *:nth-child(1) { animation-delay: 0ms; }
+.stagger-children > *:nth-child(2) { animation-delay: 100ms; }
+.stagger-children > *:nth-child(3) { animation-delay: 200ms; }
+.stagger-children > *:nth-child(4) { animation-delay: 300ms; }
+.stagger-children > *:nth-child(5) { animation-delay: 400ms; }
+</file>
+
+<file path="src/main.tsx">
+import { createRoot } from "react-dom/client";
+import App from "./App.tsx";
+</file>
+
+<file path="src/vite-env.d.ts">
+/// <reference types="vite/client" />
+</file>
+
+<file path=".gitattributes">
+# Auto detect text files and perform LF normalization
+* text=auto
+</file>
+
+<file path=".gitignore">
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+</file>
+
+<file path=".vercelignore">
+node_modules
+.git
+.env
+.env.local
+.env.*.local
+dist
+*.log
+.DS_Store
+coverage
+.eslintcache
+.turbo
+</file>
+
+<file path="dev.sh">
+#!/usr/bin/env bash
+# dev.sh — helper to run the project in development
+# Usage: ./dev.sh
+set -euo pipefail
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$ROOT_DIR"
+echo "Starting local dev helper..."
+# Install dependencies if node_modules missing
+if [ ! -d "node_modules" ]; then
+  echo "node_modules not found — installing dependencies (npm ci)"
+  npm ci
+fi
+echo "Running dev server (npm run dev). Use Ctrl+C to stop."
+exec npm run dev
+</file>
+
+<file path="eslint.config.js">
+
+</file>
+
+<file path="eval "$(ssh-agent -s)"">
+-----BEGIN OPENSSH PRIVATE KEY-----
+b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAAAMwAAAAtzc2gtZW
+QyNTUxOQAAACC8gFhK/lqyuW7nOH619ODgdYaVdIHTOhJGTosVkKxHGAAAAKDlM5jx5TOY
+8QAAAAtzc2gtZWQyNTUxOQAAACC8gFhK/lqyuW7nOH619ODgdYaVdIHTOhJGTosVkKxHGA
+AAAECumTqphhBuVvPeZHH+cXVY0X+/vJG/E9B10VUCs2NT2LyAWEr+WrK5buc4frX04OB1
+hpV0gdM6EkZOixWQrEcYAAAAFnlvdXJfZW1haWxAZXhhbXBsZS5jb20BAgMEBQYH
+-----END OPENSSH PRIVATE KEY-----
+</file>
+
+<file path="eval "$(ssh-agent -s)".pub">
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILyAWEr+WrK5buc4frX04OB1hpV0gdM6EkZOixWQrEcY your_email@example.com
+</file>
+
+<file path="index.html">
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Set the document title and basic metadata -->
+    <title>Skill Swap</title>
+    <meta name="description" content="Skill Swap — a simple skill exchange prototype" />
+    <meta name="author" content="Skill Swap" />
+    <meta property="og:title" content="Skill Swap" />
+    <meta property="og:description" content="Skill Swap — a simple skill exchange prototype" />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="/og-image.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@SkillSwap" />
+    <meta name="twitter:image" content="/og-image.png" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+</file>
+
+<file path="local_db.json">
+{"users":[{"id":"user_0x4ubeu6656d_mlsbkipr","email":"hardhikbhatia0@gmail.com","name":"dnndjas","password":"Hb251207"}],"profiles":[],"matches":[],"conversations":[],"messages":[]}
+</file>
+
+<file path="local_db.json.broken.20260218090122">
+{\n  "users": [\n    {\n      "id": "user_alice_1",\n      "email": "alice@example.com",\n      "name": "Alice",\n      "password": "secret"\n    },\n    {\n      "id": "user_bob_1",\n      "email": "bob@example.com",\n      "name": "Bob",\n      "password": "secret"\n    },\n    {\n      "id": "user_carla_1",\n      "email": "carla@example.com",\n      "name": "Carla",\n      "password": "secret"\n    },\n    {\n      "id": "user_dave_1",\n      "email": "dave@example.com",\n      "name": "Dave",\n      "password": "secret"\n    }\n  ],\n  "profiles": [\n    {\n      "id": "profile_alice_1",\n      "user_id": "user_alice_1",\n      "name": "Alice",\n      "college": "MIT",\n      "branch": "Computer Science",\n      "year": "3",\n      "bio": "CS student who teaches Guitar and wants to learn French.",\n      "avatar_url": null,\n      "is_profile_complete": true,\n      "created_at": "2026-02-18T10:00:00Z",\n      "updated_at": "2026-02-18T10:00:00Z"\n    },\n    {\n      "id": "profile_bob_1",\n      "user_id": "user_bob_1",\n      "name": "Bob",\n      "college": "Stanford",\n      "branch": "Electrical Engineering",\n      "year": "4",\n      "bio": "Engineer who teaches French and wants to learn Guitar.",\n      "avatar_url": null,\n      "is_profile_complete": true,\n      "created_at": "2026-02-17T12:00:00Z",\n      "updated_at": "2026-02-17T12:00:00Z"\n    },\n    {\n      "id": "profile_carla_1",\n      "user_id": "user_carla_1",\n      "name": "Carla",\n      "college": "UCLA",\n      "branch": null,\n      "year": null,\n      "bio": "Likes cooking and wants to improve photography.",\n      "avatar_url": null,\n      "is_profile_complete": false,\n      "created_at": "2026-02-16T15:30:00Z",\n      "updated_at": "2026-02-16T15:30:00Z"\n    },\n    {\n      "id": "profile_dave_1",\n      "user_id": "user_dave_1",\n      "name": "Dave",\n      "college": "Oxford",\n      "branch": "Mathematics",\n      "year": "2",\n      "bio": "Interested in photography and data science.",\n      "avatar_url": null,\n      "is_profile_complete": true,\n      "created_at": "2026-02-15T09:20:00Z",\n      "updated_at": "2026-02-15T09:20:00Z"\n    }\n  ],\n  "matches": [\n    {\n      "id": "match_alice_bob_1",\n      "user1_id": "user_alice_1",\n      "user2_id": "user_bob_1",\n      "match_score": 95,\n      "match_type": "perfect",\n      "match_reasons": [\n        "Alice teaches Guitar; Bob wants Guitar",\n        "Bob teaches French; Alice wants French"\n      ],\n      "match_mutual_skills": ["Guitar"],\n      "match_one_way_for_user": [],\n      "match_one_way_from_user": [],\n      "status": "accepted",\n      "created_at": "2026-02-18T11:00:00Z"\n    },\n    {\n      "id": "match_alice_carla_1",\n      "user1_id": "user_alice_1",\n      "user2_id": "user_carla_1",\n      "match_score": 68,\n      "match_type": "good",\n      "match_reasons": ["Alice teaches Cooking which Carla wants"],\n      "match_mutual_skills": [],\n      "match_one_way_for_user": ["Cooking"],\n      "match_one_way_from_user": [],\n      "status": "pending",\n      "created_at": "2026-02-17T18:00:00Z"\n    },\n    {\n      "id": "match_bob_dave_1",\n      "user1_id": "user_bob_1",\n      "user2_id": "user_dave_1",\n      "match_score": 42,\n      "match_type": "potential",\n      "match_reasons": ["Some overlapping interests but few mutual skills"],\n      "match_mutual_skills": [],\n      "match_one_way_for_user": [],\n      "match_one_way_from_user": [],\n      "status": "rejected",\n      "created_at": "2026-02-10T08:00:00Z"\n    }\n  ],\n  "conversations": [\n    {\n      "id": "convo_ab_1",\n      "match_id": "match_alice_bob_1",\n      "created_at": "2026-02-18T11:05:00Z"\n    }\n  ],\n  "messages": [\n    {\n      "id": "msg_ab_1",\n      "conversation_id": "convo_ab_1",\n      "sender_id": "user_alice_1",\n      "content": "Hi Bob! I saw we both like Guitar — would you like to meet to practice?",\n      "is_read": true,\n      "created_at": "2026-02-18T11:06:00Z"\n    },\n    {\n      "id": "msg_ab_2",\n      "conversation_id": "convo_ab_1",\n      "sender_id": "user_bob_1",\n      "content": "Hey Alice — that sounds great! I'm free this weekend.",\n      "is_read": false,\n      "created_at": "2026-02-18T11:10:00Z"\n    }\n  ]\n}\n{"users":[],"profiles":[],"matches":[],"conversations":[],"messages":[]}
+</file>
+
+<file path="package.json">
+{
+  "name": "vite_react_shadcn_ts",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "build:dev": "vite build --mode development",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@hookform/resolvers": "^3.10.0",
+    "@radix-ui/react-accordion": "^1.2.11",
+    "@radix-ui/react-alert-dialog": "^1.1.14",
+    "@radix-ui/react-aspect-ratio": "^1.1.7",
+    "@radix-ui/react-avatar": "^1.1.10",
+    "@radix-ui/react-checkbox": "^1.3.2",
+    "@radix-ui/react-collapsible": "^1.1.11",
+    "@radix-ui/react-context-menu": "^2.2.15",
+    "@radix-ui/react-dialog": "^1.1.14",
+    "@radix-ui/react-dropdown-menu": "^2.1.15",
+    "@radix-ui/react-hover-card": "^1.1.14",
+    "@radix-ui/react-label": "^2.1.7",
+    "@radix-ui/react-menubar": "^1.1.15",
+    "@radix-ui/react-navigation-menu": "^1.2.13",
+    "@radix-ui/react-popover": "^1.1.14",
+    "@radix-ui/react-progress": "^1.1.7",
+    "@radix-ui/react-radio-group": "^1.3.7",
+    "@radix-ui/react-scroll-area": "^1.2.9",
+    "@radix-ui/react-select": "^2.2.5",
+    "@radix-ui/react-separator": "^1.1.7",
+    "@radix-ui/react-slider": "^1.3.5",
+    "@radix-ui/react-slot": "^1.2.3",
+    "@radix-ui/react-switch": "^1.2.5",
+    "@radix-ui/react-tabs": "^1.1.12",
+    "@radix-ui/react-toast": "^1.2.14",
+    "@radix-ui/react-toggle": "^1.1.9",
+    "@radix-ui/react-toggle-group": "^1.1.10",
+    "@radix-ui/react-tooltip": "^1.2.7",
+    "@tanstack/react-query": "^5.83.0",
+    "appwrite": "^14.0.1",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "cmdk": "^1.1.1",
+    "date-fns": "^3.6.0",
+    "embla-carousel-react": "^8.6.0",
+    "framer-motion": "^12.24.12",
+    "input-otp": "^1.4.2",
+    "lucide-react": "^0.462.0",
+    "next-themes": "^0.3.0",
+    "react": "^18.3.1",
+    "react-day-picker": "^8.10.1",
+    "react-dom": "^18.3.1",
+    "react-hook-form": "^7.61.1",
+    "react-resizable-panels": "^2.1.9",
+    "react-router-dom": "^6.30.1",
+    "recharts": "^2.15.4",
+    "sonner": "^1.7.4",
+    "tailwind-merge": "^2.6.0",
+    "tailwindcss-animate": "^1.0.7",
+    "vaul": "^0.9.9",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.32.0",
+    "@tailwindcss/typography": "^0.5.16",
+    "@types/node": "^22.16.5",
+    "@types/react": "^18.3.23",
+    "@types/react-dom": "^18.3.7",
+    "@vitejs/plugin-react-swc": "^3.11.0",
+    "autoprefixer": "^10.4.21",
+    "eslint": "^10.0.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.20",
+    "globals": "^15.15.0",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.56.0",
+    "vite": "^7.3.1"
+  }
+}
+</file>
+
+<file path="postcss.config.js">
+
+</file>
+
+<file path="README.md">
+# Skill Swap
+
+Skill Swap is a student‑focused skill‑exchange app. Students create a profile, list skills they can **teach** and **want to learn**, and get matched with other students for chat‑based exchanges.
+
+The current version is completely **backend‑less** in terms of external services – all data is stored locally in the browser as JSON using `localStorage`, which makes it ideal for demos, prototyping, and offline use.
+
+---
+
+## Features
+
+- **Authentication (local JSON)**
+  - Email + password sign up and sign in.
+
+- **Profile management**
+  - **Year selector**: dropdown with `1st year`, `2nd year`, `3rd year`, `4th year`, and `Pass-out` (only one value at a time).
+  - Read‑only email field sourced from authentication.
+  - Profile completeness flag (`is_profile_complete`) persisted.
+- **Skills (teach / learn)**
+  - Separate lists for:
+    - **Skills you can teach** (e.g. React, UI design).
+    - **Skills you want to learn** (e.g. TypeScript, public speaking).
+  - Add skills via input + “Add” button or Enter key.
+  - Skills are stored on the profile as:
+## Deployment (local-first)
+
+This project is intended to run completely locally as a single-page Vite app.
+
+- **Build command**: `npm run build`
+- **Output directory**: `dist`
+
+SPA routing is supported when serving `dist` from a static host. For local
+development, use the preview command:
+
+```bash
+npm run build
+npm run preview
+```
+
+Note: Vercel/Render-specific configs have been removed to keep the repo
+focused on local development.
+  - Shows:
+    - Match score and type.
+    - Key reasons for the match.
+    - Skills they can teach and want to learn.
+
+- **Chat**
+  - Conversation list with last message preview and unread counts.
+  - Full chat window with:
+    - Grouped messages by day.
+    - Timestamps (“Today 3:20 PM”, “Yesterday …”).
+    - Typing indicator stub (UI only; local backend logs typing events to console).
+  - Messages are stored locally per conversation; read/unread state is persisted.
+
+### UI & UX
+
+- **Design system**
+  - Tailwind CSS + custom design tokens defined in `src/index.css`.
+  - Primary palette: pastel blue, lavender, and mint.
+  - Glassmorphism cards (`.glass-card`), glowing hero buttons, and subtle shadows.
+
+- **Layout**
+  - `Navbar` with:
+    - Desktop top bar (logo, nav buttons, avatar dropdown).
+    - Mobile top bar with slide‑in menu.
+    - Mobile bottom nav bar with icons.
+  - Pages use a shared **animated gradient background** (`.gradient-bg`).
+
+- **Animations**
+  - Framer Motion for page, card, and chat message animations.
+  - Tailwind utilities for fade/slide/scale‑in on page sections.
+
+---
+
+## Architecture
+
+### Frontend
+
+- **Framework**: React 18 + TypeScript.
+- **Bundler**: Vite.
+- **Routing**: `react-router-dom`.
+- **State / data**:
+  - React Query for network‑style data flows (currently used in parts of the app).
+  - Custom hooks for conversations, messages, typing indicators, and auth.
+
+### Local JSON “backend”
+
+All persistent data is stored in the browser using `localStorage`, abstracted by `src/services/localDb.ts`. The schema looks like this:
+
+- `users`: `{ id, email, name, password }[]`
+- `profiles`: `Profile[]` (see `src/types/index.ts`)
+- `matches`: `LocalMatch[]`
+- `conversations`: `{ id, match_id, created_at }[]`
+- `messages`: `{ id, conversation_id, sender_id, content, is_read, created_at }[]`
+
+The main services that use this local DB:
+
+- `src/contexts/AuthContext.tsx`
+  - Handles sign up/sign in/sign out via `localDb` (`localSignUp`, `localSignIn`, `localSignOut`).
+  - Restores current user from a session key in `localStorage`.
+
+- `src/pages/Profile.tsx`
+  - Loads / saves profile using `getProfileByUserId` and `upsertProfile`.
+
+- `src/services/matchService.ts`
+  - Reads profiles and their `skills_teach` / `skills_learn` to compute match scores.
+  - Persists match results in local JSON (`readMatches`, `writeMatches`).
+  - Exposes:
+    - `generateMatchesForUser(userId)`
+    - `getUserMatches(userId)`
+    - `getAllUsersWithScores(userId)`
+
+- `src/services/appwriteService.ts` (now local)
+  - Reimplemented to use the same JSON DB instead of Appwrite:
+    - `fetchConversationsForUser`
+    - `fetchMessagesForConversation`
+    - `markMessagesRead`
+    - `sendMessageToConversation`
+  - `createMessagesChannel` / `removeChannel` return dummy values and act as no‑ops for realtime (sufficient for single‑device use).
+
+> **Note:** The old Appwrite integration code is still present but unused. The app runs fully against `localDb` by default.
+
+---
+
+## Running the app locally
+
+### Prerequisites
+
+- Node.js 18+ (recommended).
+- npm (comes with Node).
+
+### Install dependencies
+
+```bash
+npm install
+```
+
+### Start the dev server
+
+```bash
+npm run dev
+```
+
+Then open `http://localhost:5173` in your browser.
+
+### Build & preview production bundle
+
+```bash
+npm run build
+npm run preview
+```
+
+The build output is written to the `dist/` folder.
+
+### Local DB tool
+
+For quick local testing and to manipulate the app's local JSON database from the terminal, use the bundled helper script:
+
+```bash
+# initialize an empty local_db.json (optional)
+./scripts/local_db_tool.py init
+
+# add a user
+./scripts/local_db_tool.py add-user --email you@example.com --password secret --name "Your Name"
+
+# upsert a profile for an existing user
+./scripts/local_db_tool.py upsert-profile --user-id user_xxx --name "Your Name" --college "My University"
+
+# add a message to a conversation
+./scripts/local_db_tool.py add-message --conversation-id convo_xxx --sender-id user_xxx --content "hello"
+
+# show the full DB
+./scripts/local_db_tool.py show
+```
+
+The script reads/writes `local_db.json` at the repository root. It's intended for local development only and mirrors the shape used by the app's `src/services/localDb.ts`.
+
+---
+
+## Data storage & resetting
+
+Because the backend is fully local:
+
+- All data is **stored per browser/device**.
+- Clearing **site data** or **localStorage** will reset the app to a fresh state.
+
+To reset manually in the browser:
+
+1. Open DevTools → Application (or Storage) tab.
+2. Under **Local Storage**, find your app’s origin.
+3. Delete keys starting with:
+   - `skill_swap_local_db_v1`
+   - `skill_swap_session_user_id`
+
+---
+
+## Git & GitHub (keep simple)
+
+This repo is configured for a simple `main`-first workflow. Recommended
+practices to keep GitHub interactions minimal and predictable:
+
+- Work locally on feature branches, but merge to `main` for releases.
+- Use SSH keys for authentication to avoid credential popups.
+- Keep CI minimal or disable it if you only want local builds (no `.github/workflows` present).
+
+Common commands:
+
+```bash
+# Install deps
+npm ci
+
+# Start dev server
+npm run dev
+
+# Build for production
+npm run build
+
+# Push local main to GitHub (SSH remote expected)
+git checkout main
+git pull origin main
+git push origin main
+```
+
+If you want me to simplify history (squash or rewrite) or remove remote branches,
+I can do that — but it is destructive. Ask before a force-push.
+
+---
+
+## API endpoints (demo only)
+
+The project still includes a small demo API under `/api` for examples/prototyping:
+
+- `GET /api/health` — Health check.
+- `GET /api/items` — Returns a list of mock items.
+- `GET /api/items/:id` — Returns a single mock item by ID.
+
+These endpoints are **not** used by the main Skill Swap flows; they’re only illustrative.
+
+---
+
+## Tech stack
+
+- **Language**: TypeScript
+- **Framework**: React 18
+- **Build tool**: Vite
+- **Styling**:
+  - Tailwind CSS
+  - Custom CSS design system (`src/index.css`)
+- **UI components**:
+  - Shadcn‑style UI components in `src/components/ui`
+  - Lucide icons
+- **Animations**:
+  - Framer Motion
+- **State / data**:
+  - React Query (for async data patterns)
+  - Custom hooks for auth, conversations, messages, typing indicator
+
+---
+
+## Limitations & future improvements
+
+- **Single‑device only**:
+  - All data lives in the browser; there is no shared backend.
+  - Two different devices/browsers will not see each other’s profiles or messages.
+
+- **Security**:
+  - Passwords are stored in plain text in local JSON – acceptable for a prototype but **not** for production.
+
+- **Realtime**:
+  - Typing indicators and message subscriptions are local stubs; there is no cross‑device realtime.
+
+### Possible next steps
+
+- Replace local JSON storage with a real backend (e.g. Appwrite, Supabase, or custom Node/Express + database).
+- Implement proper authentication with hashed passwords and tokens.
+- Add image upload for avatars and richer profile fields (links, tags).
+- Improve skill management with autocomplete and shared skill catalog.
+- Add notifications and more advanced match workflows (accept/reject/invite).
+
+---
+
+## License
+
+This project is intended as a learning/prototype project. Add a license here if you plan to publish or share it more broadly.
+</file>
+
+<file path="tailwind.config.ts">
+import type { Config } from "tailwindcss";
+</file>
+
+<file path="tsconfig.app.json">
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+    "jsx": "react-jsx",
+
+    /* Linting */
+    "strict": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noImplicitAny": false,
+    "noFallthroughCasesInSwitch": false,
+
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["src"]
+}
+</file>
+
+<file path="tsconfig.json">
+{
+  "files": [],
+  "references": [{ "path": "./tsconfig.app.json" }, { "path": "./tsconfig.node.json" }],
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+    "noImplicitAny": false,
+    "skipLibCheck": true,
+    "allowJs": true,
+    "strictNullChecks": false
+  }
+}
+</file>
+
+<file path="tsconfig.node.json">
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2023"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+
+    /* Linting */
+    "strict": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noFallthroughCasesInSwitch": true
+  },
+  "include": ["vite.config.ts"]
+}
+</file>
+
+<file path="vite.config.ts">
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react-swc";
+import path from "path";
+import fs from "fs";
+import { resolve } from "path";
+import type { Plugin } from "vite";
+⋮----
+function localDbDevPlugin(): Plugin
+⋮----
+configureServer(server)
+⋮----
+// GET/POST JSON endpoint
+⋮----
+/* ignore */
+⋮----
+// broadcast to SSE clients
+⋮----
+// ignore
+⋮----
+// SSE endpoint for live updates
+⋮----
+// ignore
+⋮----
+// watch the file and notify connected clients
+⋮----
+// ignore
+⋮----
+// ignore
+⋮----
+// ignore
+⋮----
+// https://vitejs.dev/config/
+</file>
+
+</files>

@@ -36,8 +36,28 @@ npm run build
 npm run preview
 ```
 
-Note: Vercel/Render-specific configs have been removed to keep the repo
-focused on local development.
+### Full-stack deploy (Vercel + Render + Supabase)
+
+1. Frontend (Vercel)
+   - Add env var `VITE_API_URL` to your Vercel project, e.g. `https://skill-swap-api.onrender.com`.
+   - Build is standard, no special Vercel config needed.
+
+2. Backend (Render)
+   - Deploy `server/` as a Node service.
+   - Set env vars in Render:
+     - `PORT` (e.g. 8888)
+     - `JWT_SECRET`
+     - `SUPABASE_URL`
+     - `SUPABASE_SERVICE_ROLE_KEY`
+
+3. Database (Supabase)
+   - Create a project and run `server/schema.sql` in Supabase SQL editor.
+   - Apply row-level security (RLS) policies for `profiles`, `matches`, `conversations`, `messages`.
+
+4. Local fallback (optional)
+   - You can keep the existing local mod in `src/services/localDb.ts` while migrating.
+
+Note: the existing local storage behavior is still useful for demo mode and low-scale local testing.
   - Shows:
     - Match score and type.
     - Key reasons for the match.
