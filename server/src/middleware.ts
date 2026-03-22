@@ -7,10 +7,11 @@ export interface AuthRequest extends Request {
   userId?: string;
 }
 
-export const authRequired = (req: AuthRequest, res: Response, next: NextFunction) => {
+export const authRequired = (req: AuthRequest, res: Response, next: NextFunction): void => {
   const auth = req.headers["authorization"]?.toString().split(" ");
   if (!auth || auth[0] !== "Bearer" || !auth[1]) {
-    return res.status(401).json({ error: "Unauthorized" });
+    res.status(401).json({ error: "Unauthorized" });
+    return;
   }
 
   try {
@@ -18,6 +19,6 @@ export const authRequired = (req: AuthRequest, res: Response, next: NextFunction
     req.userId = data.sub;
     next();
   } catch (error) {
-    return res.status(401).json({ error: "Invalid token" });
+    res.status(401).json({ error: "Invalid token" });
   }
 };

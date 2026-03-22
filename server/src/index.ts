@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import cors from "cors";
 import jwt from "jsonwebtoken";
 import { supabase } from "./supabase.js";
@@ -11,23 +11,23 @@ const jwtSecret = process.env.JWT_SECRET || "secret";
 app.use(cors({ origin: true }));
 app.use(express.json());
 
-app.get("/health", (_req, res) => res.json({ status: "ok" }));
+app.get("/health", (_req: Request, res: Response) => res.json({ status: "ok" }));
 
-app.post("/auth/register", async (req, res) => {
+app.post("/auth/register", async (req: Request, res: Response) => {
   const { email, password, name } = req.body;
   if (!email || !password || !name) return res.status(400).json({ error: "Missing required fields" });
 
   const { data: existing } = await supabase.from("users").select("id").eq("email", email).single();
   if (existing) return res.status(409).json({ error: "Email already exists" });
 
-  const { data, error } = await supabase.from("users").insert([{ email, name, password_hash: password }]).single();
+  const { data, error } = await supabase.from("users").insert([{ email, name, password_hash: password }]).select("id,email,name").single();
   if (error || !data) return res.status(500).json({ error: error?.message || "Failed to create user" });
 
   const token = jwt.sign({ sub: data.id }, jwtSecret, { expiresIn: "7d" });
   res.json({ token, user: { id: data.id, email: data.email, name: data.name } });
 });
 
-app.post("/auth/login", async (req, res) => {
+app.post("/auth/login", async (req: Request, res: Response) => {
   const { email, password } = req.body;
   if (!email || !password) return res.status(400).json({ error: "Missing required fields" });
 
@@ -40,15 +40,15 @@ app.post("/auth/login", async (req, res) => {
   res.json({ token, user: { id: data.id, email: data.email, name: data.name } });
 });
 
-app.get("/profile", authRequired, async (req, res) => {
-  const userId = req.userId!;
+app.get("/profile", authRequired, async (req: Request, res: Response) => {
+  const userId = (req as any).userId!;
   const { data, error } = await supabase.from("profiles").select("*").eq("user_id", userId).single();
   if (error) return res.status(500).json({ error: error.message });
   res.json({ profile: data });
 });
 
-app.put("/profile", authRequired, async (req, res) => {
-  const userId = req.userId!;
+app.put("/profile", authRequired, async (req: Request, res: Response) => {
+  const userId = (req as any).userId!;
   const body = req.body;
   const values = {
     user_id: userId,
@@ -73,8 +73,8 @@ app.put("/profile", authRequired, async (req, res) => {
   res.json({ profile: data });
 });
 
-app.get("/matches", authRequired, async (req, res) => {
-  const userId = req.userId!;
+app.get("/matches", authRequired, async (req: Request, res: Response) => {
+  const userId = (req as any).userId!;
   const { data, error } = await supabase
     .rpc("get_matches_for_user", { p_user_id: userId })
     .limit(100);
@@ -82,21 +82,21 @@ app.get("/matches", authRequired, async (req, res) => {
   res.json({ matches: data || [] });
 });
 
-app.post("/matches/generate", authRequired, async (req, res) => {
-  const userId = req.userId!;
+app.post("/matches/generate", authRequired, async (req: Request, res: Response) => {
+  const userId = (req as any).userId!;
   const { data, error } = await supabase.rpc("generate_matches_for_user", { p_user_id: userId });
   if (error) return res.status(500).json({ error: error.message });
   res.json({ created: data });
 });
 
-app.get("/conversations", authRequired, async (req, res) => {
-  const userId = req.userId!;
+app.get("/conversations", authRequired, async (req: Request, res: Response) => {
+  const userId = (req as any).userId!;
   const { data, error } = await supabase.rpc("get_conversations_for_user", { p_user_id: userId });
   if (error) return res.status(500).json({ error: error.message });
   res.json({ conversations: data || [] });
 });
 
-app.get("/conversations/:conversationId/messages", authRequired, async (req, res) => {
+app.get("/conversations/:conversationId/messages", authRequired, async (req: Request, res: Response) => {
   const conversationId = req.params.conversationId;
   const { data, error } = await supabase
     .from("messages")
@@ -107,9 +107,9 @@ app.get("/conversations/:conversationId/messages", authRequired, async (req, res
   res.json({ messages: data || [] });
 });
 
-app.post("/conversations/:conversationId/messages", authRequired, async (req, res) => {
+app.post("/conversations/:conversationId/messages", authRequired, async (req: Request, res: Response) => {
   const conversationId = req.params.conversationId;
-  const userId = req.userId!;
+  const userId = (req as any).userId!;
   const { content } = req.body;
   if (!content || !content.trim()) return res.status(400).json({ error: "Message is required" });
 
