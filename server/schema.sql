@@ -95,7 +95,10 @@ returns table (
   match_one_way_from_user text[]
 )
 language sql as $$
-  select * from matches where user1_id = p_user_id or user2_id = p_user_id order by match_score desc;
+  select id, user1_id, user2_id, match_score, match_type, status, match_reasons, match_mutual_skills, match_one_way_for_user, match_one_way_from_user
+  from matches
+  where user1_id = p_user_id or user2_id = p_user_id
+  order by match_score desc;
 $$;
 
 -- NOTE: A true generate_matches_for_user function belongs in app logic, not SQL.
