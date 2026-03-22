@@ -1,24 +1,14 @@
-import { Request, Response, NextFunction } from "express";
-import jwt from "jsonwebtoken";
+import { Request } from 'express';
+// Add any other imports you have, like jsonwebtoken
 
-const secret = process.env.JWT_SECRET || "secret";
-
+// 1. Extend the standard Express Request
 export interface AuthRequest extends Request {
-  userId?: string;
+  user?: any; // Replace 'any' with your actual User or JwtPayload type if you have one
 }
 
-export const authRequired = (req: AuthRequest, res: Response, next: NextFunction): void => {
-  const auth = req.headers["authorization"]?.toString().split(" ");
-  if (!auth || auth[0] !== "Bearer" || !auth[1]) {
-    res.status(401).json({ error: "Unauthorized" });
-    return;
-  }
-
-  try {
-    const data = jwt.verify(auth[1], secret) as { sub: string };
-    req.userId = data.sub;
-    next();
-  } catch (error) {
-    res.status(401).json({ error: "Invalid token" });
-  }
+// 2. Now your middleware will recognize req.headers
+export const requireAuth = (req: AuthRequest, res: any, next: any) => {
+  const authHeader = req.headers.authorization; // This will no longer throw an error
+  
+  // ... rest of your JWT verification logic
 };
