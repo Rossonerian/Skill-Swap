@@ -29,22 +29,6 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// 🔥 Demo Accounts
-const DEMO_USERS: Record<string, User> = {
-  "alex@demo.com": {
-    id: "alex-id",
-    email: "alex@demo.com",
-    name: "Alex Johnson",
-  },
-  "maya@demo.com": {
-    id: "maya-id",
-    email: "maya@demo.com",
-    name: "Maya Sharma",
-  },
-};
-
-const DEMO_PASSWORD = "123456";
-
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
