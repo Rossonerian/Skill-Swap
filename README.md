@@ -4,6 +4,12 @@
 
 ---
 
+## 📚 Documentation
+
+- **[DEPLOYMENT_STATUS.md](DEPLOYMENT_STATUS.md)** — Detailed deployment checklist, verification steps, and troubleshooting guide
+
+---
+
 ## What is Skill Swap?
 
 - **For students**: Find peers to exchange skills with (e.g., "I teach Python, want to learn UI Design").
