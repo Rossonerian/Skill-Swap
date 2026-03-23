@@ -41,14 +41,14 @@ app.post("/auth/login", async (req: Request, res: Response) => {
 });
 
 app.get("/profile", requireAuth, async (req: AuthRequest, res: Response) => {
-  const userId = (req as any).userId!;
+  const userId = req.userId!;
   const { data, error } = await supabase.from("profiles").select("*").eq("user_id", userId).single();
   if (error) return res.status(500).json({ error: error.message });
   res.json({ profile: data });
 });
 
 app.put("/profile", requireAuth, async (req: AuthRequest, res: Response) => {
-  const userId = (req as any).userId!;
+  const userId = req.userId!;
   const body = req.body;
   const values = {
     user_id: userId,
@@ -90,7 +90,7 @@ app.post("/matches/generate", requireAuth, async (req: AuthRequest, res: Respons
 });
 
 app.get("/conversations", requireAuth, async (req: AuthRequest, res: Response) => {
-  const userId = (req as any).userId!;
+  const userId = req.userId!;
   const { data, error } = await supabase.rpc("get_conversations_for_user", { p_user_id: userId });
   if (error) return res.status(500).json({ error: error.message });
   res.json({ conversations: data || [] });
