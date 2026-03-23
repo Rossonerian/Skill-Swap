@@ -2,7 +2,7 @@ import express, { Request, Response } from "express";
 import cors from "cors";
 import jwt from "jsonwebtoken";
 import { supabase } from "./supabase.js";
-import { authRequired } from "./middleware.js";
+import { requireAuth, AuthRequest } from "./middleware.js";
 
 const app = express();
 const port = Number(process.env.PORT || 8888);
@@ -40,14 +40,14 @@ app.post("/auth/login", async (req: Request, res: Response) => {
   res.json({ token, user: { id: data.id, email: data.email, name: data.name } });
 });
 
-app.get("/profile", authRequired, async (req: Request, res: Response) => {
+app.get("/profile", requireAuth, async (req: AuthRequest, res: Response) => {
   const userId = (req as any).userId!;
   const { data, error } = await supabase.from("profiles").select("*").eq("user_id", userId).single();
   if (error) return res.status(500).json({ error: error.message });
   res.json({ profile: data });
 });
 
-app.put("/profile", authRequired, async (req: Request, res: Response) => {
+app.put("/profile", requireAuth, async (req: AuthRequest, res: Response) => {
   const userId = (req as any).userId!;
   const body = req.body;
   const values = {
@@ -73,7 +73,7 @@ app.put("/profile", authRequired, async (req: Request, res: Response) => {
   res.json({ profile: data });
 });
 
-app.get("/matches", authRequired, async (req: Request, res: Response) => {
+app.get("/matches", requireAuth, async (req: AuthRequest, res: Response) => {
   const userId = (req as any).userId!;
   const { data, error } = await supabase
     .rpc("get_matches_for_user", { p_user_id: userId })
@@ -82,21 +82,21 @@ app.get("/matches", authRequired, async (req: Request, res: Response) => {
   res.json({ matches: data || [] });
 });
 
-app.post("/matches/generate", authRequired, async (req: Request, res: Response) => {
+app.post("/matches/generate", requireAuth, async (req: AuthRequest, res: Response) => {
   const userId = (req as any).userId!;
   const { data, error } = await supabase.rpc("generate_matches_for_user", { p_user_id: userId });
   if (error) return res.status(500).json({ error: error.message });
   res.json({ created: data });
 });
 
-app.get("/conversations", authRequired, async (req: Request, res: Response) => {
+app.get("/conversations", requireAuth, async (req: AuthRequest, res: Response) => {
   const userId = (req as any).userId!;
   const { data, error } = await supabase.rpc("get_conversations_for_user", { p_user_id: userId });
   if (error) return res.status(500).json({ error: error.message });
   res.json({ conversations: data || [] });
 });
 
-app.get("/conversations/:conversationId/messages", authRequired, async (req: Request, res: Response) => {
+app.get("/conversations/:conversationId/messages", requireAuth, async (req: AuthRequest, res: Response) => {
   const conversationId = req.params.conversationId;
   const { data, error } = await supabase
     .from("messages")
@@ -107,7 +107,7 @@ app.get("/conversations/:conversationId/messages", authRequired, async (req: Req
   res.json({ messages: data || [] });
 });
 
-app.post("/conversations/:conversationId/messages", authRequired, async (req: Request, res: Response) => {
+app.post("/conversations/:conversationId/messages", requireAuth, async (req: AuthRequest, res: Response) => {
   const conversationId = req.params.conversationId;
   const userId = (req as any).userId!;
   const { content } = req.body;
