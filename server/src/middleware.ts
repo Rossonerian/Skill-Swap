@@ -1,9 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
-import { ParamsDictionary, ParsedQs } from 'express-serve-static-core';
 import jwt from 'jsonwebtoken';
 
 // 1. Extend the standard Express Request
-export interface AuthRequest<P extends ParamsDictionary = ParamsDictionary, ResBody = any, ReqBody = any, ReqQuery = ParsedQs> extends Request<P, ResBody, ReqBody, ReqQuery> {
+export interface AuthRequest extends Request {
   user?: any; // Replace 'any' with your actual User or JwtPayload type if you have one
   userId?: string;
 }
