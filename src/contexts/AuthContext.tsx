@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { apiLogin, apiRegister } from "@/services/api";
+import { localSignIn, localSignUp, localSignOut } from "@/services/localDb";
+import { DEMO_MODE } from "@/demo";
 
 type User = {
   id: string;
@@ -52,12 +54,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const signUp = async (email: string, password: string, name: string) => {
     try {
-      const { token, user: newUser } = await apiRegister(email, password, name);
-      localStorage.setItem("skill_swap_token", token);
-      localStorage.setItem("skill_swap_user", JSON.stringify(newUser));
-      setUser(newUser);
-      setSession({ user: newUser });
-      return { error: null };
+      if (DEMO_MODE) {
+        const { user: newUser, error } = await localSignUp(email, password, name);
+        if (error || !newUser) {
+          return { error: new Error(error?.message || "Failed to sign up") };
+        }
+        localStorage.setItem("skill_swap_token", "demo_token");
+        localStorage.setItem("skill_swap_user", JSON.stringify(newUser));
+        setUser(newUser);
+        setSession({ user: newUser });
+        return { error: null };
+      } else {
+        const { token, user: newUser } = await apiRegister(email, password, name);
+        localStorage.setItem("skill_swap_token", token);
+        localStorage.setItem("skill_swap_user", JSON.stringify(newUser));
+        setUser(newUser);
+        setSession({ user: newUser });
+        return { error: null };
+      }
     } catch (error: any) {
       return { error: new Error(error.message || "Failed to sign up") };
     }
@@ -65,18 +79,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const signIn = async (email: string, password: string) => {
     try {
-      const { token, user: loggedUser } = await apiLogin(email, password);
-      localStorage.setItem("skill_swap_token", token);
-      localStorage.setItem("skill_swap_user", JSON.stringify(loggedUser));
-      setUser(loggedUser);
-      setSession({ user: loggedUser });
-      return { error: null };
+      if (DEMO_MODE) {
+        const { user: loggedUser, error } = await localSignIn(email, password);
+        if (error || !loggedUser) {
+          return { error: new Error(error?.message || "Invalid credentials") };
+        }
+        localStorage.setItem("skill_swap_token", "demo_token");
+        localStorage.setItem("skill_swap_user", JSON.stringify(loggedUser));
+        setUser(loggedUser);
+        setSession({ user: loggedUser });
+        return { error: null };
+      } else {
+        const { token, user: loggedUser } = await apiLogin(email, password);
+        localStorage.setItem("skill_swap_token", token);
+        localStorage.setItem("skill_swap_user", JSON.stringify(loggedUser));
+        setUser(loggedUser);
+        setSession({ user: loggedUser });
+        return { error: null };
+      }
     } catch (error: any) {
       return { error: new Error(error.message || "Invalid credentials") };
     }
   };
 
   const signOut = async () => {
+    if (DEMO_MODE) {
+      await localSignOut();
+    }
     localStorage.removeItem("skill_swap_token");
     localStorage.removeItem("skill_swap_user");
     setUser(null);
